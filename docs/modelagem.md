@@ -19,6 +19,6 @@ Os laboratórios, por sua vez, são identificados pelo número do bloco, número
 
 Os horários determinam as informações temporais relativas ao semestre: dia da semana, data, horário de início e fim da reserva, bem como se o laboratório estará bloqueado em determinados momentos, impedindo novas reservas.
 
-Por fim, cada reserva tem identificação do usuário titular, o laboratório reservado, informações sobre o horário da reserva, o status da reserva (confirmada, finalizada, ou cancelada), e a identificação caso seja referente a manutenção.
+Por fim, cada reserva tem identificação do usuário titular, o laboratório reservado, informações sobre o dia/horário da reserva, o status da reserva (confirmada, finalizada, ou cancelada), e a identificação caso seja referente a manutenção.
 
 Com esses dados disponíveis, é possível organizar o sistema de reservas de maneira eficiente e programar um sistema que realize sua função de forma satisfatória.
