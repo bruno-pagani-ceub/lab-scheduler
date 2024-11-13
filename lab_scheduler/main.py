@@ -9,7 +9,7 @@ from database.sql import SQL
 def main():
     root = tk.Tk()
     root.title("Lab Scheduler")
-    root.geometry("400x400")
+    root.geometry("300x500")
 
     # Initialize connection
     db = SQL(

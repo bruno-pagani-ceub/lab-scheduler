@@ -1,6 +1,6 @@
 from views import MainView
 
-from .timeslots_controller import TimeSlotsRegistrationController
+from .timeslots_controller import TimeSlotsController
 from .user_controller import UserController, UserRegistrationController
 from .labs_controller import LabController
 from .reservation_controller import ReservationController, LabReservationController
@@ -13,7 +13,7 @@ class MainController:
         self.root = root
         self.db = db
         self.view = MainView(root, self)
-        self.view.pack(fill="both", expand=True)
+        # self.view.pack(fill="both", expand=True)
 
     def register_user(self):
         UserRegistrationController(self.root, self.db)
@@ -34,4 +34,4 @@ class MainController:
         LabController(self.root, self.db)
 
     def manage_time_slots(self):
-        TimeSlotsRegistrationController(self.root, self.db)
+        TimeSlotsController(self.root, self.db)

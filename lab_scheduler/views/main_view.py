@@ -1,25 +1,25 @@
 # views/main_view.py
-from .templates.main_template import BaseView
+from .templates.main_template import MainTemplate
 
-class MainView(BaseView):
+class MainView(MainTemplate):
     """Main application view."""
 
     def __init__(self, parent, controller):
-        super().__init__(parent, controller)
-        self.create_main_page()
+        self.controller = controller
+        super().__init__(parent)
 
-    def create_main_page(self):
-        # Main Section (no title)
-        self.create_button(self, "Cadastrar Usuário", self.controller.register_user)
-        self.create_button(self, "Reservar Laboratório", self.controller.reserve_lab)
+    def create_widgets(self):
+        main_section = self.add_section(self, "Menu Rápido")
+        self.add_button(main_section, "Cadastrar Usuário", self.controller.register_user, row=1, sticky="w")
+        self.add_button(main_section, "Reservar Laboratório", self.controller.reserve_lab, row=2, sticky="w")
 
         # Reports Section
-        reports_section = self.create_section("Relatórios")
-        self.create_button(reports_section, "Gerar Cronograma semanal", self.controller.generate_schedule)
+        reports_section = self.add_section(self, "Relatórios")
+        self.add_button(reports_section, "Gerar Cronograma semanal", self.controller.generate_schedule, row=3, sticky="w")
 
         # Management Section
-        management_section = self.create_section("Gerenciamento")
-        self.create_button(management_section, "Gerenciar usuários", self.controller.manage_users)
-        self.create_button(management_section, "Gerenciar reservas", self.controller.manage_reservations)
-        self.create_button(management_section, "Gerenciar laboratórios", self.controller.manage_labs)
-        self.create_button(management_section, "Gerenciar horários", self.controller.manage_time_slots)
+        management_section = self.add_section(self, "Gerenciamento")
+        self.add_button(management_section, "Gerenciar usuários", self.controller.manage_users, row=4, sticky="w")
+        self.add_button(management_section, "Gerenciar reservas", self.controller.manage_reservations,row=5, sticky="w")
+        self.add_button(management_section, "Gerenciar laboratórios", self.controller.manage_labs,row=6, sticky="w")
+        self.add_button(management_section, "Gerenciar horários", self.controller.manage_time_slots,row=7, sticky="w")
