@@ -1,5 +1,4 @@
-# views/main_view.py
-from .templates.main_template import MainTemplate
+from lab_scheduler.views.templates.main_template import MainTemplate
 
 class MainView(MainTemplate):
     """Main application view."""
