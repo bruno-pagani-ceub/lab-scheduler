@@ -1,0 +1,14 @@
+services:
+  db:
+    image: mysql:8.0
+    container_name: lab_scheduler_db_dev
+    environment:
+      - MYSQL_ROOT_PASSWORD=senha123
+      - MYSQL_DATABASE=lab_scheduler
+    ports:
+      - "3306:3306"
+    volumes:
+      - db_data_dev:/var/lib/mysql
+
+volumes:
+  db_data_dev:
