@@ -7,7 +7,7 @@ class UserController:
         self.root = root
         self.db = db
         self.view = UserView(root, self)
-        self.model = UserModel
+        self.model = UserModel(db=db)
 
 class UserRegistrationController:
     def __init__(self, root, db):
@@ -15,8 +15,9 @@ class UserRegistrationController:
         self.db = db
         self.view = UserRegistrationView(root, self)
         
-    def create_user(full_name, role, doc):
+    def create_user(self, full_name, role, doc):
         '''Inserts New User in Database.'''
+        self.model.save_user(full_name, role, doc)
         pass
         
     

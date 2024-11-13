@@ -9,7 +9,7 @@ class ScheduleGenerationController:
         self.db = db
         self.view = ScheduleGenerationView(root, self)
         self.report_generator = Folder()
-        self.model = ReportModel
+        self.model = ReportModel(db=db)
         
     def _get_week_schedule_data(self): 
         pass

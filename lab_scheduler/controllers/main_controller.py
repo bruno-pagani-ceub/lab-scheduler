@@ -20,7 +20,7 @@ class MainController:
         self.root = root
         self.db = db
         self.view = MainView(root, self)
-        self.model = SetupModel(db)
+        self.model = SetupModel(db=db)
 
         self.view.pack(fill="both", expand=True)
         self.model.ensure_tables()

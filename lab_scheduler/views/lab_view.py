@@ -22,7 +22,7 @@ class UpdateLabView(FormPopup):
     def __init__(self, parent, controller):
         self.controller = controller
         self.time_slots = []
-        super().__init__(parent, title="Cadastar Laboratório")
+        super().__init__(parent, title="Alterar um Laboratório")
 
     def create_widgets(self):
         pass

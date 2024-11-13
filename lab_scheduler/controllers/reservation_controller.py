@@ -7,7 +7,7 @@ class ReservationController:
         self.root = root
         self.db = db
         self.view = ReservationView(root, self)
-        self.model = ReservationModel
+        self.model = ReservationModel(db=db)
 
 class LabReservationController:
     def __init__(self, root, db):

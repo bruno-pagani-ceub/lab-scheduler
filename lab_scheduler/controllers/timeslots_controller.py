@@ -7,15 +7,12 @@ class TimeSlotsController:
         self.root = root
         self.db = db
         self.view = TimeSlotsView(root, self)
-        self.model = TimeSlotsModel
+        self.model = TimeSlotsModel(db=db)
 
     def get_time_slots(self, semester, year):
         """Logic for getting concatanated timeslots for a week in a semester in a year"""
         return self.model.get_time_slots(self.db, semester, year)
 
-    def get_time_slot_by_id(self):
-        """Fetch the time slot details"""
-        pass
 
     def update_time_slots(self, start_time, end_time, weekdays, semester, year):
         UpdateTimeSlotsController(
