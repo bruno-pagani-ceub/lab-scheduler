@@ -1,10 +1,17 @@
-from views import MainView
+from lab_scheduler.controllers.labs_controller import LabController
+from lab_scheduler.controllers.reports_controller import ScheduleGenerationController
+from lab_scheduler.controllers.reservation_controller import (
+    LabReservationController,
+    ReservationController,
+)
+from lab_scheduler.controllers.timeslots_controller import TimeSlotsController
+from lab_scheduler.controllers.user_controller import (
+    UserController,
+    UserRegistrationController,
+)
+from lab_scheduler.database.models import SetupModel
+from lab_scheduler.views import MainView
 
-from .timeslots_controller import TimeSlotsRegistrationController
-from .user_controller import UserController, UserRegistrationController
-from .labs_controller import LabController
-from .reservation_controller import ReservationController, LabReservationController
-from .reports_controller import ScheduleGenerationController
 
 class MainController:
     """Controller for the main application."""
@@ -13,7 +20,10 @@ class MainController:
         self.root = root
         self.db = db
         self.view = MainView(root, self)
+        self.model = SetupModel(db=db)
+
         self.view.pack(fill="both", expand=True)
+        self.model.ensure_tables()
 
     def register_user(self):
         UserRegistrationController(self.root, self.db)
@@ -34,4 +44,4 @@ class MainController:
         LabController(self.root, self.db)
 
     def manage_time_slots(self):
-        TimeSlotsRegistrationController(self.root, self.db)
+        TimeSlotsController(self.root, self.db)

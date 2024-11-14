@@ -1,1 +1,1 @@
-# TODO: Adicionar registros de teste para a tabela de laboratorio
+-- TODO: Adicionar registros de teste para a tabela de laboratorio

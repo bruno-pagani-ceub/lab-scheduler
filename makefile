@@ -1,6 +1,6 @@
 VENV_DIR := venv
 PYTHON := $(VENV_DIR)/bin/python
-MYSQL_HOST := localhost
+MYSQL_HOST := 127.0.0.1
 MYSQL_USER := root
 MYSQL_PASSWORD := senha123
 MYSQL_DATABASE := lab_scheduler
@@ -38,7 +38,7 @@ dev: venv
 	export MYSQL_USER=$(MYSQL_USER) && \
 	export MYSQL_PASSWORD=$(MYSQL_PASSWORD) && \
 	export MYSQL_DATABASE=$(MYSQL_DATABASE) && \
-	$(PYTHON) lab_scheduler/main.py
+	$(PYTHON) -m lab_scheduler.main
 
 test: venv
 	@$(MAKE) db ENVIRONMENT=testing COMPOSE_FILE=docker-compose.test.yml DB_CONTAINER_NAME=lab_scheduler_db_test
@@ -48,7 +48,7 @@ test: venv
 	export MYSQL_PASSWORD=$(MYSQL_PASSWORD) && \
 	export MYSQL_DATABASE=$(MYSQL_DATABASE) && \
 	export MYSQL_PORT=$(MYSQL_PORT_TEST) && \
-	$(PYTHON) lab_scheduler/main.py
+	$(PYTHON) -m lab_scheduler.main
 
 clean:
 	@echo "Cleaning up..."

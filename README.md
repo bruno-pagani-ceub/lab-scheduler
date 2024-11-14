@@ -169,11 +169,11 @@ flowchart LR
 
 ### Componentes Principais
 
-- **Models (`lab_scheduler/database/`):**
-  - Gerenciam a conexão e operações com o banco de dados.
+- **Models (`lab_scheduler/database/models`):**
+  - Gerencia as operações com o banco de dados.
 
 - **Controllers (`lab_scheduler/controllers/`):**
-  - Contêm a lógica de negócios e controlam o fluxo de dados entre a View e o Model.
+  - Controlam o fluxo de dados entre a View e o Model.
 
 - **Views (`lab_scheduler/views/`):**
   - Responsáveis pela interface gráfica utilizando Tkinter.

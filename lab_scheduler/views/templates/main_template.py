@@ -1,21 +1,32 @@
-# views/base_view.py
 import tkinter as tk
 from tkinter import ttk
 
-class BaseView(ttk.Frame):
-    """Base class for all views, providing standardized components."""
-
-    def __init__(self, parent, controller):
+class MainTemplate(ttk.Frame):
+    def __init__(self, parent, title="LabScheduler"):
         super().__init__(parent)
-        self.controller = controller
-        self.pack(fill="both", expand=True, padx=10, pady=10)
+        self.title = title
+        self.padx = 10
+        self.pady = 10
+        self.pack(fill="both", expand=True, padx=self.padx, pady=self.pady)
+        
+        self.create_widgets()
 
-    def create_section(self, title):
-        frame = ttk.LabelFrame(self, text=title)
-        frame.pack(fill="x", padx=10, pady=10)
+    def add_section(self, parent, title):
+        frame = ttk.LabelFrame(parent, text=title)
+        frame.pack(fill="x", padx=self.padx, pady=self.pady)
         return frame
 
-    def create_button(self, parent, text, command):
+    def add_button(self, parent, text, command, row, column=0, columnspan=1, **kwargs):
         button = ttk.Button(parent, text=text, command=command)
-        button.pack(fill="x", pady=5)
+        button.grid(
+            row=row,
+            column=column,
+            columnspan=columnspan,
+            padx=self.padx,
+            pady=self.pady,
+            **kwargs,
+        )
         return button
+
+    def create_widgets(self):
+        raise NotImplementedError("Subclasses must implement create_widgets method.")

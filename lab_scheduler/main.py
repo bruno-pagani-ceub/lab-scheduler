@@ -1,25 +1,24 @@
 import os
 import tkinter as tk
 
-from controllers import MainController
-from database.setup import ensure_tables
-from database.sql import SQL
+from lab_scheduler.controllers import MainController
+from lab_scheduler.database.sql import SQL
 
 
 def main():
+    # Initialize top level widget
     root = tk.Tk()
     root.title("Lab Scheduler")
-    root.geometry("400x400")
+    root.geometry("300x500")
 
-    # Initialize connection
+    # Initialize database connection
     db = SQL(
-        host=os.environ.get("MYSQL_HOST", "localhost"),
+        host=os.environ.get("MYSQL_HOST", "127.0.0.1"),
         user=os.environ.get("MYSQL_USER", "root"),
         port=int(os.environ.get("MYSQL_PORT", "3306")),
         password=os.environ.get("MYSQL_PASSWORD", "senha123"),
         database=os.environ.get("MYSQL_DATABASE", "lab_scheduler"),
     )
-    ensure_tables(db=db)
 
     # Initialize the controller
     _ = MainController(root, db)
