@@ -1,6 +1,6 @@
 VENV_DIR := venv
 PYTHON := $(VENV_DIR)/bin/python
-MYSQL_HOST := localhost
+MYSQL_HOST := 127.0.0.1
 MYSQL_USER := root
 MYSQL_PASSWORD := senha123
 MYSQL_DATABASE := lab_scheduler

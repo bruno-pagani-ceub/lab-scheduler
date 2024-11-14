@@ -7,7 +7,7 @@ class LabController:
         self.root = root
         self.db = db
         self.view = LabView(root, self)
-        self.model = LabModel
+        self.model = LabModel(db=db)
 
 class LabRegistrationController:
     def __init__(self, root, db):

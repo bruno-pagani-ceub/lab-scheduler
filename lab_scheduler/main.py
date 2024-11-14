@@ -13,7 +13,7 @@ def main():
 
     # Initialize database connection
     db = SQL(
-        host=os.environ.get("MYSQL_HOST", "localhost"),
+        host=os.environ.get("MYSQL_HOST", "127.0.0.1"),
         user=os.environ.get("MYSQL_USER", "root"),
         port=int(os.environ.get("MYSQL_PORT", "3306")),
         password=os.environ.get("MYSQL_PASSWORD", "senha123"),

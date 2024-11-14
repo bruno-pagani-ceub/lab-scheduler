@@ -1,5 +1,9 @@
-import mysql.connector
+import time
 
+import mysql.connector
+from mysql.connector import Error
+
+CONNECTION_RETRIES = 10
 
 class SQL:
     def __init__(
@@ -10,15 +14,26 @@ class SQL:
         database: str,
         port: int,
     ):
-        try:
-            self.conn = mysql.connector.connect(
-                host=host, user=user, password=password, database=database, port=port
-            )
-            if self.conn.is_connected():
-                print("Connected to MySQL database")
-        except mysql.connector.Error as e:
-            print(f"Error connecting to MySQL: {e}")
-            return None
+        retry_count = 0
+        while True:
+            try:
+                self.conn = mysql.connector.connect(
+                    host=host,
+                    port=port,
+                    user=user,
+                    password=password,
+                    database=database,
+                )
+                if self.conn.is_connected():
+                    print("Connected to MySQL database")
+                    break
+            except Error as err:
+                if retry_count >= CONNECTION_RETRIES:
+                    print(f"Error connecting to MySQL: {err}")
+                    exit(1)
+                print(f"Attempt {retry_count + 1}: Unable to connect, retrying in 2 seconds...")
+                time.sleep(2)
+                retry_count += 1
 
     def __del__(self):
         self.conn.close()
