@@ -22,56 +22,38 @@ Este documento descreve as regras de nomenclatura adotadas no projeto para tabel
 - As tabelas devem sempre estar no singular.
 - Colunas que representam chaves primárias devem ser nomeadas como `id`.
 - Colunas que representam chaves estrangeiras devem incluir o nome da tabela referenciada no singular com o prefixo `id_` (ex.: `id_usuario`).
-- Colunas booleanas devem ter nomes iniciados por `is_` (ex.: `is_reservado`).
 - Não exceder o limite máximo de 30 caracteres para os nomes das tabelas ou colunas
 
 ---
 
-### 3.2. Regras por Entidade
+### 3.2. Nomenclatura de atributos
+Para garantir consistência e facilitar a identificação do tipo de dado, as colunas devem incluir os seguintes prefixos:
 
-#### Tabela: `laboratorio`
-- **Descrição**: Contém informações sobre os laboratórios.
-- **Colunas**:
-  - `id` (PK): Identificador único do laboratório.
-  - `bloco`: Bloco onde o laboratório está localizado.
-  - `sala`: Número da sala.
-  - `qtde_pcs`: Quantidade de computadores disponíveis.
-
-#### Tabela: `horario`
-- **Descrição**: Representa horários selecionados.
-- **Colunas**:
-  - `id` (PK): Identificador único do horário.
-  - `dt_dia`: Data específica do horário.
-  - `dia_semana`: Dia da semana.
-  - `hr_inicio`: Hora de início.
-  - `hr_fim`: Hora de término.
-  - `semestre`: Semestre correspondente.
-  - `ano`: Ano correspondente.
-
-#### Tabela: `laboratorio_horario`
-- **Descrição**: Tabela de associação entre laboratórios e horários.
-- **Colunas**:
-  - `id` (PK): Identificador único da associação.
-  - `id_laboratorio` (FK): Referência ao laboratório.
-  - `id_horario` (FK): Referência ao horário.
-  - `is_reservado`: Indica se o horário está reservado.
-
-#### Tabela: `reserva`
-- **Descrição**: Contém informações sobre as reservas realizadas.
-- **Colunas**:
-  - `id` (PK): Identificador único da reserva.
-  - `id_usuario` (FK): Referência ao usuário.
-  - `id_laboratorio_horario` (FK): Referência ao laboratório-horário reservado.
-  - `status`: Status da reserva (ex.: ativo, cancelado).
-  - `tipo`: Tipo de reserva.
-
-#### Tabela: `usuario`
-- **Descrição**: Informações sobre os usuários do sistema.
-- **Colunas**:
-  - `id` (PK): Identificador único do usuário.
-  - `nome`: Nome completo.
-  - `posicao`: Posição ou cargo do usuário.
-  - `identificacao`: Documento ou matrícula.
+| Tipo de Dado          | Prefixo      | Exemplo               |
+|-----------------------|--------------|-----------------------|
+| Data                  | `dt_`        | `dt_reserva`          |
+| Hora                  | `hr_`        | `hr_reserva`          |
+| Minuto                | `min_`       | `min_reserva`         |
+| Segundos              | `seg_`       | `seg_reserva`         |
+| Número                | `nr_`        | `nr_quantidade`       |
+| Nome                  | `nm_`        | `nm_usuario`          |
+| Indicador (Booleano)  | `is_`        | `is_reservado`        |
+| Descrição/Texto       | `ds_`        | `ds_laboratorio`      |
+| Telefone              | `tel_`       | `tel_contato`         |
+| Valor Monetário       | `vl_`        | `vl_reserva`          |
+| Chave estrangeira (FK)| `id_`        | `id_reserva`          |
+| Senha                 | `pwd_`       | `pwd_usuario`         |
+| Tipo                  | `tp_`        | `tp_usuario`          |
+| Quantidade            | `qtd_`       | `qtd_computadores`    |
+| Data e Hora           | `dti_`       | `dti_reserva`         |
+| Endereço              | `end_`       | `end_usuario`         |
+| Imagem                | `img_`       | `img_perfil`          |
+| Observação            | `obs_`       | `obs_reserva`         |
+| Percentual            | `pct_`       | `pct_reservas`        |
+| Status                | `sts_`       | `sts_reserva`         |
+| Tipo                  | `tp_`        | `tp_usuario`          |
+| Total                 | `tot_`       | `tot_reservas`        |
+| Usuário               | `usr_`       | `usr_reserva`         |
 
 ---
 
