@@ -57,7 +57,19 @@ Para garantir consistência e facilitar a identificação do tipo de dado, as co
 
 ---
 
-### 3.3. Regras para Índices e Constraints
+### 3.4. Regras de nomenclatura para tabelas
+
+#### **TABELA BÁSICA (`tb_`)**
+Conhecidas também como **tabelas fortes**, essas tabelas são geralmente compostas por um número maior de colunas. Elas representam as entidades mais relevantes dentro do contexto do negócio em questão, desempenhando um papel central no modelo de dados. Seu foco está em capturar os principais elementos do processo ou operação analisada.
+
+#### **TABELA DE DOMÍNIO (`td_`)**
+As **tabelas de domínio**, também chamadas de **tabelas descritivas** ou **tabelas tradicionais**, possuem um número reduzido de campos. Normalmente, contêm informações simples, como siglas e nomes, e servem para categorizar ou descrever dados utilizados em outras tabelas. Elas funcionam como **tabelas de referência**, frequentemente associadas a campos chave estrangeira.
+
+#### **TABELA ASSOCIATIVA (`ta_`)**
+Essas tabelas são criadas para formalizar a conexão entre duas ou mais entidades em um **relacionamento de muitos para muitos (N-N)**. Elas têm como objetivo a organização e a integração de dados de diferentes partes do modelo, ajudando na normalização do banco de dados, com foco na **3ª Forma Normal**.
+
+
+### 3.5. Regras para Índices e Constraints
 - Índices: Nomear como `idx_<tabela>_<coluna>` (ex.: `idx_laboratorio_bloco`).
 - Chaves estrangeiras: Nomear como `id_<tabela_referenciada>` (ex.: `id_usuario`).
 
