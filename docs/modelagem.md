@@ -11,14 +11,20 @@ Por fim, a entidade "**horário**", relacionada com a reserva em uma relação N
 
 # Modelo lógico
 
-![modelagem lógica](modelagem_logica.jpg)
+![modelagem lógica](modelo_logico.jpg)
 
-Na etapa de modelagem lógica, atribuímos ao usuário as características nome, posição (que pode ser aluno, professor, funcionário ou visitante) e identificação (que depende da posição, podendo ser a matrícula de professor ou funcionário, RA de aluno, ou CPF de visitante).
+Na etapa de modelagem lógica, atribuímos ao usuário as características nome, posição (que pode ser aluno, professor, funcionário ou visitante, por meio da tabela td_tipo_usuario) e identificação (que depende da posição, podendo ser a matrícula de professor ou funcionário, RA de aluno, ou CPF de visitante).
 
 Os laboratórios, por sua vez, são identificados pelo número do bloco, número da sala, e a quantidade de computadores à disposição.
 
-Os horários determinam as informações temporais relativas ao semestre: dia da semana, data, horário de início e fim da reserva, bem como se o laboratório estará bloqueado em determinados momentos, impedindo novas reservas.
+Os horários determinam as informações temporais relativas ao semestre: data, horário de início e fim da reserva.
 
-Por fim, cada reserva tem identificação do usuário titular, o laboratório reservado, o status da reserva (confirmada, finalizada, ou cancelada), e a identificação caso seja referente a manutenção. Ela se relaciona com as entidades "laboratório" e "horário" através da tabela associativa laboratorio_horario, que associa cada laboratório com os horários definidos pela administração e define se cada "slot" está disponível ou não.
+Por fim, cada reserva tem identificação do usuário titular, o laboratório reservado e o status da reserva (ativa ou não). Ela se relaciona com as entidades "laboratório" e "horário" através da tabela associativa ta_laboratorio_horario, que associa cada laboratório com os horários definidos pela administração e define se cada "slot" está disponível ou não.
 
 Com esses dados disponíveis, é possível organizar o sistema de reservas de maneira eficiente e programar um sistema que realize sua função de forma satisfatória.
+
+# Modelo físico
+
+![modelagem física](modelo_fisico.jpg)
+
+Por fim, na etapa de modelagem física, foram criadas as tabelas que representam as entidades do modelo lógico, com as colunas necessárias para cada uma, já seguindo as regras de nomenclatura definidas e definindo o tipo de cada atributo.
