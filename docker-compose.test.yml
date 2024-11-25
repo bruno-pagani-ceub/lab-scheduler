@@ -1,0 +1,11 @@
+services:
+  db:
+    image: mysql:8.0
+    container_name: lab_scheduler_db_test
+    environment:
+      - MYSQL_ROOT_PASSWORD=senha123
+      - MYSQL_DATABASE=lab_scheduler
+    ports:
+      - "3307:3306"
+    volumes:
+      - ./tests/database:/docker-entrypoint-initdb.d:ro
