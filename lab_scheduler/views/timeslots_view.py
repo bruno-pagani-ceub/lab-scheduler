@@ -4,7 +4,7 @@ from itertools import product
 from tkinter import messagebox
 
 from lab_scheduler.utils import helper, validate
-from lab_scheduler.views import static
+from lab_scheduler.controllers import static
 from lab_scheduler.views.templates.form_popup_template import FormPopup
 
 
@@ -36,7 +36,7 @@ class TimeSlotsView(FormPopup):
             parent=management_section,
             label_text=field_name,
             variable=self.semester_var,
-            values=static.SEMESTERS,
+            values=list(static.SEMESTERS_INFO.keys()),
             row=2,
             column=0,
             required=True,
@@ -65,13 +65,10 @@ class TimeSlotsView(FormPopup):
             columnspan=4,
         )
 
-        columns_map = {
-            "Horários": "hor",
-            **static.MAPPED_WEEKDAYS,
-        }
+        columns = ["Horários"] + static.WEEKDAYS
         columns_configs = [
-            {"column": col, "text": desc, "width": 100, "anchor": "center"}
-            for desc, col in columns_map.items()
+            {"column": col, "text": col, "width": 100, "anchor": "center"}
+            for col in columns
         ]
         self.tree = self.add_treeview(
             parent=management_section,
@@ -124,6 +121,7 @@ class TimeSlotsView(FormPopup):
             time_slots = self.controller.get_time_slots(
                 self.selected_semester, self.selected_year
             )
+            print(time_slots)
             if not time_slots:
                 messagebox.showerror(
                     "Erro", "Não há horários cadastrados para esse semestre"
@@ -133,27 +131,31 @@ class TimeSlotsView(FormPopup):
             self.display_time_slots(table_data)
         except Exception as e:
             messagebox.showerror("Erro", f"Falha ao carregar horários: {e}")
+            print(e)
+
 
     def format_time_slots_table(self, data):
         time_slots = {}
         for record in data:
+            print(f"record: {record}")
             ds_dia_semana = record["ds_dia_semana"]
-            day_abbrev = static.MAPPED_WEEKDAYS[ds_dia_semana]
             hr_ini = record["hr_ini"]
             hr_fim = record["hr_fim"]
             time_slot = f"{hr_ini} - {hr_fim}"
 
             if time_slot not in time_slots:
                 time_slots[time_slot] = set()
-            time_slots[time_slot].add(day_abbrev)
+            time_slots[time_slot].add(ds_dia_semana)
+        print(f"time_slots: {time_slots}")
 
         output = []
         for time_slot in sorted(time_slots.keys()):
-            slot_dict = {"hor": time_slot}
+            slot_dict = {"Horários": time_slot}
             days = time_slots[time_slot]
-            for day_abbrev in static.ABBREVIATED_WEEKDAYS:
-                slot_dict[day_abbrev] = "X" if day_abbrev in days else ""
+            for day in static.WEEKDAYS:
+                slot_dict[day] = "X" if day in days else ""
             output.append(slot_dict)
+        print(f"output: {output}")
 
         return output
 
@@ -179,7 +181,7 @@ class TimeSlotsView(FormPopup):
     def get_selected_values_from_line(self, values: list):
         start_time, end_time = values.pop(0).split(" - ")
         weekdays = [
-            day for i, day in enumerate(static.DESCRIPTIVE_WEEKDAYS) if values[i]
+            day for i, day in enumerate(static.WEEKDAYS) if values[i]
         ]
         return start_time, end_time, weekdays
 
@@ -231,7 +233,7 @@ class TimeSlotsRegistrationView(FormPopup):
             self,
             label_text="Semestre",
             variable=self.semester_var,
-            values=static.SEMESTERS,
+            values=list(static.SEMESTERS_INFO.keys()),
             row=1,
             column=0,
             required=True,
@@ -252,7 +254,7 @@ class TimeSlotsRegistrationView(FormPopup):
         self.weekday_vars = self.add_checkbuttons(
             self,
             label_text="Dias da Semana",
-            options=static.DESCRIPTIVE_WEEKDAYS,
+            options=static.WEEKDAYS,
             row=2,
             column=0,
         )
@@ -377,6 +379,7 @@ class TimeSlotsRegistrationView(FormPopup):
             messagebox.showinfo("Sucesso", "Horários salvos com sucesso.")
         except Exception as e:
             messagebox.showerror("Erro", f"Falha ao salvar horários: {e}")
+            print(e)
 
 
 class UpdateTimeSlotView(FormPopup):
@@ -417,10 +420,10 @@ class UpdateTimeSlotView(FormPopup):
         self.weekday_vars = self.add_checkbuttons(
             self,
             label_text="Dias da Semana",
-            options=static.DESCRIPTIVE_WEEKDAYS,
+            options=static.WEEKDAYS,
             row=2,
             column=1,
-            disabled=[day for day in static.DESCRIPTIVE_WEEKDAYS if day not in self.weekdays]
+            disabled=[day for day in static.WEEKDAYS if day not in self.weekdays]
         )
 
         self.start_time_var = tk.StringVar()
