@@ -193,7 +193,7 @@ class UpdateTimeSlotsController:
         updates = _get_records_from_summary(new_timeslots) 
         return self.model.update_time_slots((start_time, end_time), updates)
 
-    def remove_time_slot(self, lines):
-        """Logic for Deleting Time Slots in Database."""
-        print(f"Lines to remove: {lines}")
+    def remove_time_slot(self, timeslots):
+        removes = _get_records_from_summary(timeslots)
+        self.model.delete_time_slots(removes)                
         ## TODO: don't forget to write logic for deleting from associative table

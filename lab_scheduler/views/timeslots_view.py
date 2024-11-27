@@ -469,12 +469,17 @@ class UpdateTimeSlotView(FormPopup):
             messagebox.showerror("Erro", f"Falha ao alterar horários: {e}")
 
     def submit_remove(self):
-        lines, err = self.process_selected_values()
+        _, err = self.process_selected_values()
+        timeslots = [
+            (self.start_time, self.end_time, weekday, self.semester, self.year)
+            for weekday, var in self.weekday_vars.items() if var.get()
+        ]
         if err:
             messagebox.showerror("Erro", err)
             return
         try:
-            self.controller.remove_time_slot(lines)
+            
+            self.controller.remove_time_slot(timeslots)
             messagebox.showinfo("Sucesso", "Horário excluído com sucesso.")
             self.destroy()
         except Exception as e:

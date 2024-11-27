@@ -20,6 +20,28 @@ class TimeSlotsModel:
             params_list.append(params)
         return self.db.upd_del_many(update_query, params_list)
 
+    def delete_time_slots(self, records):
+        placeholders = ', '.join(['%s'] * len(records))
+        select_query = f'''
+            SELECT id
+            FROM tb_horario
+            WHERE dt_dia IN ({placeholders}) AND hr_inicio = %s AND hr_fim = %s
+        '''
+        start_time = records[0][1]
+        end_time = records[0][2]
+        days = [record[0] for record in records]
+        params = (*days, start_time, end_time)
+        results = self.db.get_list(select_query, params)
+        ids = [result["id"] for result in results]
+        
+        query = f"DELETE FROM ta_laboratorio_horario WHERE id_horario IN ({placeholders})"
+        
+        self.db.upd_del(query, ids)
+        
+        query = f"DELETE FROM tb_horario WHERE id IN ({placeholders})"
+        
+        return self.db.upd_del(query, ids)
+
 
     
     def save_time_slots(self, inserts):
