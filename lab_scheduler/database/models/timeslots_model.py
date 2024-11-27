@@ -5,31 +5,47 @@ class TimeSlotsModel:
     def __init__(self, db):
         self.db: SQL = db
 
+    def update_time_slots(self, old_times, updates):
+        old_start_time, old_end_time = old_times
+        
+        update_query = """
+        UPDATE tb_horario
+        SET hr_inicio = %s, hr_fim = %s
+        WHERE dt_dia = %s AND hr_inicio = %s AND hr_fim = %s
+        """
+        
+        params_list = []
+        for dt_dia, new_start_time, new_end_time in updates:
+            params = (new_start_time, new_end_time, dt_dia, old_start_time, old_end_time)
+            params_list.append(params)
+        return self.db.upd_del_many(update_query, params_list)
+
+
+    
     def save_time_slots(self, inserts):
         query = "INSERT INTO tb_horario (dt_dia, hr_inicio, hr_fim) VALUES (%s, %s, %s)"
-        return self.db.insert_many(query, inserts)
+        inserted_ids = self.db.insert_many(query, inserts)
 
-    def count_days_with_timeslot(self, weekday_number, start_month, end_month, year):
-        params = {
-            "weekday": weekday_number,
-            "start_month": start_month,
-            "end_month": end_month,
-            "year": year,
-        }
-        query = """
-            SELECT
-                COUNT(1)
-            FROM
-                tb_horario
-            WHERE
-                WEEKDAY(dt_dia) = @weekday
-                AND MONTH(dt_dia) BETWEEN @start_month AND @end_month;
-                AND YEAR(dt_dia) = @year;
-        """
-        return self.db.get_int(query, params)
-        
-    def get_time_slots_summary(self, start_month, end_month, year):
-        query = """
+        lab_query = "SELECT id FROM tb_laboratorio;"
+        lab_records = self.db.get_list(lab_query)
+        lab_ids = [lab["id"] for lab in lab_records]
+        if not lab_ids:
+            return inserted_ids
+
+        lab_horario_inserts = []
+        for horario_id in inserted_ids:
+            for lab_id in lab_ids:
+                lab_horario_inserts.append((lab_id, horario_id))
+
+        lab_horario_query = "INSERT INTO ta_laboratorio_horario (id_laboratorio, id_horario) VALUES (%s, %s)"
+        self.db.insert_many(lab_horario_query, lab_horario_inserts)
+
+        return inserted_ids
+    
+
+    def get_time_slots_summary(self, weekdays, start_month, end_month, year):
+        placeholders = ', '.join(['%s'] * len(weekdays))
+        query = f"""
             SELECT DISTINCT
                 WEEKDAY(dt_dia) AS nr_dia_semana,
                 DATE_FORMAT(hr_inicio, '%H:%i') AS hr_ini,
@@ -37,36 +53,14 @@ class TimeSlotsModel:
             FROM
                 tb_horario
             WHERE
-                YEAR(dt_dia) = %s
+                WEEKDAY(dt_dia) IN ({placeholders})
                 AND MONTH(dt_dia) BETWEEN %s AND %s
+                AND YEAR(dt_dia) = %s
             ORDER BY 
                 nr_dia_semana,
                 hr_ini,
                 hr_fim;
         """
 
-        return self.db.get_list(query, (year, start_month, end_month))
-
-        # """
-        # Logic for getting timeslots for a week
-        # in a semester in a year from database.
-
-        # Example: [
-        #     {"ds_dia_semana": "Segunda-feira", "hr_ini": "07:40", "hr_fim": "09:20"},
-        #     {"ds_dia_semana": "Segunda-feira", "hr_ini": "09:20", "hr_fim": "11:00"},
-        #     {"ds_dia_semana": "Terça-feira", "hr_ini": "07:40", "hr_fim": "09:20"},
-        #     {"ds_dia_semana": "Terça-feira", "hr_ini": "09:20", "hr_fim": "11:00"},
-        #     {"ds_dia_semana": "Terça-feira", "hr_ini": "11:00", "hr_fim": "12:40"},
-        #     {"ds_dia_semana": "Quarta-feira", "hr_ini": "09:20", "hr_fim": "11:00"},
-        #     {"ds_dia_semana": "Quarta-feira", "hr_ini": "11:00", "hr_fim": "12:40"},
-        # ]
-        # """
-        # return [
-        #     {"ds_dia_semana": "Segunda-feira", "hr_ini": "07:40", "hr_fim": "09:20"},
-        #     {"ds_dia_semana": "Segunda-feira", "hr_ini": "09:20", "hr_fim": "11:00"},
-        #     {"ds_dia_semana": "Terça-feira", "hr_ini": "07:40", "hr_fim": "09:20"},
-        #     {"ds_dia_semana": "Terça-feira", "hr_ini": "09:20", "hr_fim": "11:00"},
-        #     {"ds_dia_semana": "Terça-feira", "hr_ini": "11:00", "hr_fim": "12:40"},
-        #     {"ds_dia_semana": "Quarta-feira", "hr_ini": "09:20", "hr_fim": "11:00"},
-        #     {"ds_dia_semana": "Quarta-feira", "hr_ini": "11:00", "hr_fim": "12:40"},
-        # ]  ## TODO: remove, added for testing
+        params = tuple([*weekdays, start_month, end_month, year])
+        return self.db.get_list(query, params)

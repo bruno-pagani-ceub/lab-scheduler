@@ -4,7 +4,7 @@ from itertools import product
 from tkinter import messagebox
 
 from lab_scheduler.utils import helper, validate
-from lab_scheduler.controllers import static
+from lab_scheduler import static
 from lab_scheduler.views.templates.form_popup_template import FormPopup
 
 
@@ -80,7 +80,7 @@ class TimeSlotsView(FormPopup):
 
         self.add_button(
             parent=management_section,
-            text="Atualizar Horário",
+            text="Modificar/Remover Horário",
             command=self.update_time_slot,
             row=5,
             column=0,
@@ -89,20 +89,11 @@ class TimeSlotsView(FormPopup):
 
         self.add_button(
             parent=management_section,
-            text="Excluir Horário",
-            command=self.delete_time_slot,
+            text="Fechar",
+            command=self.destroy,
             row=5,
             column=2,
             columnspan=2,
-        )
-
-        self.add_button(
-            parent=management_section,
-            text="Fechar",
-            command=self.destroy,
-            row=6,
-            column=0,
-            columnspan=4,
         )
 
     def load_time_slots(self):
@@ -121,7 +112,6 @@ class TimeSlotsView(FormPopup):
             time_slots = self.controller.get_time_slots(
                 self.selected_semester, self.selected_year
             )
-            print(time_slots)
             if not time_slots:
                 messagebox.showerror(
                     "Erro", "Não há horários cadastrados para esse semestre"
@@ -133,11 +123,9 @@ class TimeSlotsView(FormPopup):
             messagebox.showerror("Erro", f"Falha ao carregar horários: {e}")
             print(e)
 
-
     def format_time_slots_table(self, data):
         time_slots = {}
         for record in data:
-            print(f"record: {record}")
             ds_dia_semana = record["ds_dia_semana"]
             hr_ini = record["hr_ini"]
             hr_fim = record["hr_fim"]
@@ -146,7 +134,6 @@ class TimeSlotsView(FormPopup):
             if time_slot not in time_slots:
                 time_slots[time_slot] = set()
             time_slots[time_slot].add(ds_dia_semana)
-        print(f"time_slots: {time_slots}")
 
         output = []
         for time_slot in sorted(time_slots.keys()):
@@ -155,7 +142,6 @@ class TimeSlotsView(FormPopup):
             for day in static.WEEKDAYS:
                 slot_dict[day] = "X" if day in days else ""
             output.append(slot_dict)
-        print(f"output: {output}")
 
         return output
 
@@ -180,9 +166,7 @@ class TimeSlotsView(FormPopup):
 
     def get_selected_values_from_line(self, values: list):
         start_time, end_time = values.pop(0).split(" - ")
-        weekdays = [
-            day for i, day in enumerate(static.WEEKDAYS) if values[i]
-        ]
+        weekdays = [day for i, day in enumerate(static.WEEKDAYS) if values[i]]
         return start_time, end_time, weekdays
 
     def update_time_slot(self):
@@ -192,26 +176,26 @@ class TimeSlotsView(FormPopup):
         start_time, end_time, weekdays = self.get_selected_values_from_line(
             selected_time_slot
         )
-        self.controller.update_time_slots(
+        self.controller.update_delete_time_slots(
             start_time, end_time, weekdays, self.selected_semester, self.selected_year
         )
 
-    def delete_time_slot(self):
-        """Delete the selected time slot."""
-        ts_id = self.get_selected_line()
-        if ts_id is None:
-            return
-        confirm = messagebox.askyesno(
-            "Confirmação", "Tem certeza de que deseja excluir o horário selecionado?"
-        )
-        if confirm:
-            try:
-                self.controller.delete_time_slot(ts_id)
-                messagebox.showinfo("Sucesso", "Horário excluído com sucesso.")
-                # Refresh the time slots display
-                self.load_time_slots()
-            except Exception as e:
-                messagebox.showerror("Erro", f"Falha ao excluir horário: {e}")
+    # def delete_time_slot(self):
+    #     """Delete the selected time slot."""
+    #     ts_id = self.get_selected_line()
+    #     if ts_id is None:
+    #         return
+    #     confirm = messagebox.askyesno(
+    #         "Confirmação", "Tem certeza de que deseja excluir o horário selecionado?"
+    #     )
+    #     if confirm:
+    #         try:
+    #             self.controller.delete_time_slot(ts_id)
+    #             messagebox.showinfo("Sucesso", "Horário excluído com sucesso.")
+    #             # Refresh the time slots display
+    #             self.load_time_slots()
+    #         except Exception as e:
+    #             messagebox.showerror("Erro", f"Falha ao excluir horário: {e}")
 
     def open_time_slot_registration(self):
         self.controller.register_time_slots()
@@ -383,7 +367,9 @@ class TimeSlotsRegistrationView(FormPopup):
 
 
 class UpdateTimeSlotView(FormPopup):
-    def __init__(self, parent, controller, start_time, end_time, weekdays, semester, year):
+    def __init__(
+        self, parent, controller, start_time, end_time, weekdays, semester, year
+    ):
         self.controller = controller
         self.start_time = start_time
         self.end_time = end_time
@@ -423,7 +409,7 @@ class UpdateTimeSlotView(FormPopup):
             options=static.WEEKDAYS,
             row=2,
             column=1,
-            disabled=[day for day in static.WEEKDAYS if day not in self.weekdays]
+            disabled=[day for day in static.WEEKDAYS if day not in self.weekdays],
         )
 
         self.start_time_var = tk.StringVar()
@@ -467,12 +453,16 @@ class UpdateTimeSlotView(FormPopup):
         )
 
     def submit_update(self):
-        lines, err = self.process_selected_values()
+        new_timeslots, err = self.process_selected_values()
+        old_timeslots = [
+            (self.start_time, self.end_time, weekday, self.semester, self.year)
+            for weekday, var in self.weekday_vars.items() if var.get()
+        ]
         if err:
             messagebox.showerror("Erro", err)
             return
         try:
-            self.controller.update_time_slot(lines)
+            self.controller.update_time_slot(old_timeslots, new_timeslots)
             messagebox.showinfo("Sucesso", "Horário alterado com sucesso.")
             self.destroy()
         except Exception as e:
@@ -491,11 +481,8 @@ class UpdateTimeSlotView(FormPopup):
             messagebox.showerror("Erro", f"Falha ao excluir horários: {e}")
 
     def process_selected_values(self):
-        start_time = self.start_time_var.get()
-        end_time = self.end_time_var.get()
-        semester = self.semester_var.get()
-        year = self.year_var.get()
-        
+        start_time, end_time, semester, year, weekdays = self.get_selected_vars()
+
         _, err = validate.validate_time_format(start_time)
         if err:
             return None, err
@@ -503,17 +490,23 @@ class UpdateTimeSlotView(FormPopup):
         if err:
             return None, err
 
-        selected_weekdays = [day for day, var in self.weekday_vars.items() if var.get()]
-        if not selected_weekdays:
+        if not weekdays:
             return None, "Selecione pelo menos um dia da semana."
 
-        lines = self.get_time_slot_tuple(start_time, end_time, semester, year, selected_weekdays)
+        lines = self.get_time_slot_tuple(start_time, end_time, semester, year, weekdays)
         return lines
+
+    def get_selected_vars(self):
+        start_time = self.start_time_var.get()
+        end_time = self.end_time_var.get()
+        semester = self.semester_var.get()
+        year = self.year_var.get()
+        selected_weekdays = [day for day, var in self.weekday_vars.items() if var.get()]
+        return start_time, end_time, semester, year, selected_weekdays
 
     def get_time_slot_tuple(self, start_time, end_time, semester, year, weekdays):
         lines = [
-            (start_time, end_time, weekday, semester, year)
-            for weekday in weekdays
+            (start_time, end_time, weekday, semester, year) for weekday in weekdays
         ]
-        
+
         return lines, None
