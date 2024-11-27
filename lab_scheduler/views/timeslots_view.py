@@ -3,8 +3,8 @@ from datetime import datetime
 from itertools import product
 from tkinter import messagebox
 
-from lab_scheduler.utils import helper, validate
 from lab_scheduler import static
+from lab_scheduler.utils import helper, validate
 from lab_scheduler.views.templates.form_popup_template import FormPopup
 
 
@@ -121,7 +121,6 @@ class TimeSlotsView(FormPopup):
             self.display_time_slots(table_data)
         except Exception as e:
             messagebox.showerror("Erro", f"Falha ao carregar horários: {e}")
-            print(e)
 
     def format_time_slots_table(self, data):
         time_slots = {}
@@ -363,7 +362,6 @@ class TimeSlotsRegistrationView(FormPopup):
             messagebox.showinfo("Sucesso", "Horários salvos com sucesso.")
         except Exception as e:
             messagebox.showerror("Erro", f"Falha ao salvar horários: {e}")
-            print(e)
 
 
 class UpdateTimeSlotView(FormPopup):
@@ -456,7 +454,8 @@ class UpdateTimeSlotView(FormPopup):
         new_timeslots, err = self.process_selected_values()
         old_timeslots = [
             (self.start_time, self.end_time, weekday, self.semester, self.year)
-            for weekday, var in self.weekday_vars.items() if var.get()
+            for weekday, var in self.weekday_vars.items()
+            if var.get()
         ]
         if err:
             messagebox.showerror("Erro", err)
@@ -472,13 +471,13 @@ class UpdateTimeSlotView(FormPopup):
         _, err = self.process_selected_values()
         timeslots = [
             (self.start_time, self.end_time, weekday, self.semester, self.year)
-            for weekday, var in self.weekday_vars.items() if var.get()
+            for weekday, var in self.weekday_vars.items()
+            if var.get()
         ]
         if err:
             messagebox.showerror("Erro", err)
             return
         try:
-            
             self.controller.remove_time_slot(timeslots)
             messagebox.showinfo("Sucesso", "Horário excluído com sucesso.")
             self.destroy()

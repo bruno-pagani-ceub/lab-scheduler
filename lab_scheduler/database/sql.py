@@ -3,8 +3,8 @@ import time
 import mysql.connector
 from mysql.connector import Error
 
-
 CONNECTION_RETRIES = 10
+
 
 class SQL:
     def __init__(
@@ -35,7 +35,9 @@ class SQL:
                 if retry_count >= CONNECTION_RETRIES:
                     print(f"Error connecting to MySQL: {err}")
                     exit(1)
-                print(f"Attempt {retry_count + 1}: Unable to connect, retrying in 2 seconds...")
+                print(
+                    f"Attempt {retry_count + 1}: Unable to connect, retrying in 2 seconds..."
+                )
                 time.sleep(2)
                 retry_count += 1
 
@@ -57,7 +59,7 @@ class SQL:
         finally:
             if cursor:
                 cursor.close()
-    
+
     def insert_many(self, query, params_list):
         cursor = self.conn.cursor()
         try:
@@ -89,7 +91,7 @@ class SQL:
         finally:
             if cursor:
                 cursor.close()
-                
+
     def upd_del_many(self, query, params):
         try:
             cursor = self.conn.cursor()
@@ -134,19 +136,6 @@ class SQL:
         )
         cursor.close()
         return ret
-
-    ## TODO: Não é Exatamente o que precisamos, precisa ser alterado para ler os horários
-    # def get_time(self, query, params=()):
-    #     cursor = self.conn.cursor()
-    #     cursor.execute(query, params)
-    #     hora = cursor.fetchone()[0]
-    #     total = hora.total_seconds()
-    #     hour = int(total // 3600)
-    #     minutes = int((total % 3600) // 60)
-    #     seconds = int(total % 60)
-    #     ret = f"{hour:02}:{minutes:02}"
-    #     cursor.close()
-    #     return ret
 
     def get_string(self, query, params=()):
         cursor = self.conn.cursor()

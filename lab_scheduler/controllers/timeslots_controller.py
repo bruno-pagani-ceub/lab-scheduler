@@ -6,10 +6,11 @@ from lab_scheduler import static
 from lab_scheduler.database.models import TimeSlotsModel
 from lab_scheduler.utils import helper
 from lab_scheduler.views import (
-        TimeSlotsRegistrationView,
-        TimeSlotsView,
-        UpdateTimeSlotView,
+    TimeSlotsRegistrationView,
+    TimeSlotsView,
+    UpdateTimeSlotView,
 )
+
 
 def find_overlapping_timeslots(timeslots_to_save, time_slots_saved):
     timeslots_to_save_by_day = {}
@@ -18,9 +19,7 @@ def find_overlapping_timeslots(timeslots_to_save, time_slots_saved):
     for start_time_str, end_time_str, weekday, _, _ in timeslots_to_save:
         start_time = dt.strptime(start_time_str, "%H:%M").time()
         end_time = dt.strptime(end_time_str, "%H:%M").time()
-        timeslots_to_save_by_day.setdefault(weekday, []).append(
-            (start_time, end_time)
-        )
+        timeslots_to_save_by_day.setdefault(weekday, []).append((start_time, end_time))
 
     for slot in time_slots_saved:
         start_time = dt.strptime(slot["hr_ini"], "%H:%M").time()
@@ -54,6 +53,7 @@ def find_overlapping_timeslots(timeslots_to_save, time_slots_saved):
 
     return overlapping_timeslots
 
+
 def overlap_error_message(overlapping_timeslots):
     overlaps_by_day = {}
     for slot in overlapping_timeslots:
@@ -77,35 +77,33 @@ def overlap_error_message(overlapping_timeslots):
 
 
 def _get_records_from_summary(timeslots_to_save):
-        inserts = []
-        for timeslot in timeslots_to_save:
-            start_time_str, end_time_str, weekday_name, semester_number, year_str = (
-                timeslot
-            )
-            semester_number = str(semester_number)
-            year = int(year_str)
+    inserts = []
+    for timeslot in timeslots_to_save:
+        start_time_str, end_time_str, weekday_name, semester_number, year_str = timeslot
+        semester_number = str(semester_number)
+        year = int(year_str)
 
-            weekday_number = static.WEEKDAYS_MAP[weekday_name]
-            semester_info = static.SEMESTERS_INFO[semester_number]
-            start_month = semester_info["start_month"]
-            end_month = semester_info["end_month"]
+        weekday_number = static.WEEKDAYS_MAP[weekday_name]
+        semester_info = static.SEMESTERS_INFO[semester_number]
+        start_month = semester_info["start_month"]
+        end_month = semester_info["end_month"]
 
-            start_date = datetime.date(year, start_month, 1)
-            last_day = calendar.monthrange(year, end_month)[1]
-            end_date = datetime.date(year, end_month, last_day)
+        start_date = datetime.date(year, start_month, 1)
+        last_day = calendar.monthrange(year, end_month)[1]
+        end_date = datetime.date(year, end_month, last_day)
 
-            date = start_date
-            delta = datetime.timedelta(days=1)
-            while date <= end_date:
-                if date.weekday() == weekday_number:
-                    insert_record = (
-                        date.strftime("%Y-%m-%d"),
-                        start_time_str,
-                        end_time_str,
-                    )
-                    inserts.append(insert_record)
-                date += delta
-        return inserts
+        date = start_date
+        delta = datetime.timedelta(days=1)
+        while date <= end_date:
+            if date.weekday() == weekday_number:
+                insert_record = (
+                    date.strftime("%Y-%m-%d"),
+                    start_time_str,
+                    end_time_str,
+                )
+                inserts.append(insert_record)
+            date += delta
+    return inserts
 
 
 class TimeSlotsController:
@@ -117,8 +115,10 @@ class TimeSlotsController:
 
     def get_time_slots(self, semester, year):
         start_month, end_month = helper.get_months(semester)
-        all_weekdays_numbers = [n for n in range(0,7)]
-        time_slots = self.model.get_time_slots_summary(all_weekdays_numbers, start_month, end_month, year)
+        all_weekdays_numbers = [n for n in range(0, 7)]
+        time_slots = self.model.get_time_slots_summary(
+            all_weekdays_numbers, start_month, end_month, year
+        )
         for time_slot in time_slots:
             time_slot["ds_dia_semana"] = static.WEEKDAYS[time_slot["nr_dia_semana"]]
 
@@ -143,7 +143,7 @@ class TimeSlotsRegistrationController:
     def save_time_slots(self, timeslots_to_save):
         _, _, _, semester, year = timeslots_to_save[0]
         start_month, end_month = helper.get_months(semester)
-        all_weekdays_numbers = [n for n in range(0,7)]
+        all_weekdays_numbers = [n for n in range(0, 7)]
         time_slots_saved = self.model.get_time_slots_summary(
             all_weekdays_numbers, start_month, end_month, year
         )
@@ -160,6 +160,7 @@ class TimeSlotsRegistrationController:
 
         return self.model.save_time_slots(inserts)
 
+
 class UpdateTimeSlotsController:
     def __init__(self, root, db, start_time, end_time, weekdays, semester, year):
         self.root = root
@@ -173,7 +174,7 @@ class UpdateTimeSlotsController:
         start_time, end_time, _, semester, year = old_timeslots[0]
         weekdays = set(timeslot[2] for timeslot in old_timeslots)
         start_month, end_month = helper.get_months(semester)
-        
+
         time_slots_saved = self.model.get_time_slots_summary(
             weekdays, start_month, end_month, year
         )
@@ -183,17 +184,16 @@ class UpdateTimeSlotsController:
                 continue
             time_slot["ds_dia_semana"] = static.WEEKDAYS[time_slot["nr_dia_semana"]]
             timeslots_except_old.append(time_slot)
-        
+
         overlaping_timeslots = find_overlapping_timeslots(
             new_timeslots, timeslots_except_old
         )
         if overlaping_timeslots:
             raise ValueError(overlap_error_message(overlaping_timeslots))
 
-        updates = _get_records_from_summary(new_timeslots) 
+        updates = _get_records_from_summary(new_timeslots)
         return self.model.update_time_slots((start_time, end_time), updates)
 
     def remove_time_slot(self, timeslots):
         removes = _get_records_from_summary(timeslots)
-        self.model.delete_time_slots(removes)                
-        ## TODO: don't forget to write logic for deleting from associative table
+        self.model.delete_time_slots(removes)
