@@ -179,23 +179,6 @@ class TimeSlotsView(FormPopup):
             start_time, end_time, weekdays, self.selected_semester, self.selected_year
         )
 
-    # def delete_time_slot(self):
-    #     """Delete the selected time slot."""
-    #     ts_id = self.get_selected_line()
-    #     if ts_id is None:
-    #         return
-    #     confirm = messagebox.askyesno(
-    #         "Confirmação", "Tem certeza de que deseja excluir o horário selecionado?"
-    #     )
-    #     if confirm:
-    #         try:
-    #             self.controller.delete_time_slot(ts_id)
-    #             messagebox.showinfo("Sucesso", "Horário excluído com sucesso.")
-    #             # Refresh the time slots display
-    #             self.load_time_slots()
-    #         except Exception as e:
-    #             messagebox.showerror("Erro", f"Falha ao excluir horário: {e}")
-
     def open_time_slot_registration(self):
         self.controller.register_time_slots()
 
@@ -438,7 +421,6 @@ class UpdateTimeSlotView(FormPopup):
             command=self.submit_update,
             row=4,
             column=1,
-            # sticky="E",
         )
 
         self.add_button(
@@ -447,7 +429,6 @@ class UpdateTimeSlotView(FormPopup):
             command=self.submit_remove,
             row=4,
             column=2,
-            # sticky="W",
         )
 
     def submit_update(self):

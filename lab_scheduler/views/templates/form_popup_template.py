@@ -6,15 +6,13 @@ class FormPopup(tk.Toplevel):
     def __init__(self, parent, title="Form"):
         super().__init__(parent)
         self.title(title)
-        self.grab_set()  # Make the popup modal
+        self.grab_set()
         self.resizable(False, False)
         self.padx = 10
         self.pady = 10
 
-        # List to hold required fields for validation
         self.required_fields = []
 
-        # Initialize the form widgets
         self.create_widgets()
 
     def create_widgets(self):
@@ -38,10 +36,20 @@ class FormPopup(tk.Toplevel):
         return frame
 
     def add_entry(
-        self, parent, label_text, variable, row, column=0, required=False, sticky="E", **kwargs
+        self,
+        parent,
+        label_text,
+        variable,
+        row,
+        column=0,
+        required=False,
+        sticky="E",
+        **kwargs,
     ):
         label = ttk.Label(parent, text=f"{label_text}:")
-        label.grid(row=row, column=column, sticky=sticky, padx=self.padx, pady=self.pady)
+        label.grid(
+            row=row, column=column, sticky=sticky, padx=self.padx, pady=self.pady
+        )
         entry = ttk.Entry(parent, textvariable=variable, **kwargs)
         entry.grid(row=row, column=column + 1, padx=self.padx, pady=self.pady)
         if required:
@@ -67,7 +75,9 @@ class FormPopup(tk.Toplevel):
             self.required_fields.append((label_text, variable))
         return combobox
 
-    def add_checkbuttons(self, parent, label_text, options, row, column=0, disabled=[], **kwargs):
+    def add_checkbuttons(
+        self, parent, label_text, options, row, column=0, disabled=[], **kwargs
+    ):
         label = ttk.Label(parent, text=label_text)
         label.grid(row=row, column=column, sticky="NE", padx=self.padx, pady=self.pady)
         frame = ttk.Frame(self)
@@ -117,12 +127,16 @@ class FormPopup(tk.Toplevel):
         **kwargs,
     ):
         tree = ttk.Treeview(
-            parent, columns=([config["column"] for config in columns_configs]), show=show
+            parent,
+            columns=([config["column"] for config in columns_configs]),
+            show=show,
         )
         for config in columns_configs:
             tree.heading(config["column"], text=config["text"])
         for config in columns_configs:
-            tree.column(config["column"], width=config["width"], anchor=config.get("anchor"))
+            tree.column(
+                config["column"], width=config["width"], anchor=config.get("anchor")
+            )
         for config in columns_configs:
             tree.column(config["column"], width=config["width"])
         tree.grid(
