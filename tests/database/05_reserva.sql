@@ -18,14 +18,3 @@ INSERT INTO `lab_scheduler`.`tb_reserva` (`id`, `is_ativa`, `tp_reserva`, `id_us
 
 
 
--- Seleciona todas as reservas
-SELECT * FROM `tb_reserva`;
-
--- Seleciona as reservas ativas
-SELECT * FROM `tb_reserva` WHERE `is_ativa` = 1;
-
--- Seleciona as reservas do tipo 'Aula'
-SELECT * FROM `tb_reserva` WHERE `tp_reserva` = 'Aula';
-
--- Seleciona todas as reservas inativas
-SELECT id, tp_reserva, is_ativa FROM tb_reserva WHERE is_ativa = 0;
