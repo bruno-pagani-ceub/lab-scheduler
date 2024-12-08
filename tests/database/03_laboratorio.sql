@@ -18,14 +18,3 @@ INSERT INTO `lab_scheduler`.`tb_laboratorio` (`id`, `ds_bloco`, `ds_sala`, `qtd_
 
 
 
--- Seleciona todos os laboratórios
-SELECT * FROM `tb_laboratorio`;
-
--- Seleciona os laboratórios que estão no bloco 'A'
-SELECT * FROM `tb_laboratorio` WHERE `ds_bloco` = 'A';
-
--- Conta quantos computadores (qtd_pcs) há no total em todos os laboratórios
-SELECT SUM(`qtd_pcs`) AS total_computadores FROM `tb_laboratorio`;
-
--- Lista os laboratórios que possuem até 30 computadores
-SELECT id, ds_bloco, ds_sala, qtd_pcs FROM tb_laboratorio WHERE qtd_pcs <= 30;
