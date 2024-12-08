@@ -17,11 +17,3 @@ INSERT INTO `lab_scheduler`.`ta_laboratorio_horario` (`id`, `id_laboratorio`, `i
 INSERT INTO `lab_scheduler`.`ta_laboratorio_horario` (`id`, `id_laboratorio`, `id_horario`, `is_reservado`) VALUES (DEFAULT, 15, 15, 0);
 
 
--- Seleciona todos os registros da tabela associativa
-SELECT * FROM `ta_laboratorio_horario`;
-
--- Seleciona os laboratórios reservados (is_reservado = 1)
-SELECT * FROM `ta_laboratorio_horario` WHERE `is_reservado` = 1;
-
--- Lista os horários associados a laboratórios que não estão reservados
-SELECT id, id_laboratorio, id_horario FROM ta_laboratorio_horario WHERE is_reservado = 0;
