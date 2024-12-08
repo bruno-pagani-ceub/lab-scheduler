@@ -18,15 +18,3 @@ INSERT INTO `lab_scheduler`.`tb_horario` (`id`, `dt_dia`, `hr_inicio`, `hr_fim`)
 INSERT INTO `lab_scheduler`.`tb_horario` (`id`, `dt_dia`, `hr_inicio`, `hr_fim`) VALUES (DEFAULT, '2024-11-28', '11:30:00', '12:00:00');
 
 
-
--- Seleciona todos os horários
-SELECT * FROM `tb_horario`;
-
--- Seleciona os horários em que o dia é '2024-11-25'
-SELECT * FROM `tb_horario` WHERE `dt_dia` = '2024-11-25';
-
--- Seleciona os horários que começam antes das 10:00
-SELECT * FROM `tb_horario` WHERE `hr_inicio` < '10:00:00';
-
--- Seleciona os horários que terminam antes das 18:00
-SELECT id, dt_dia, hr_inicio, hr_fim FROM tb_horario WHERE hr_fim < '18:00:00';
