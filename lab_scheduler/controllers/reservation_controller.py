@@ -9,15 +9,6 @@ class ReservationController:
         self.view = ReservationView(root, self)
         self.model = ReservationModel(db=db)
 
-<<<<<<< Updated upstream
-=======
-    def manage_reservations(self):
-        pass
-
-    def reserve_lab(self):
-        return LabReservationController(self.root, self.db)
-
->>>>>>> Stashed changes
 class LabReservationController:
     def __init__(self, root, db):
         self.root = root
