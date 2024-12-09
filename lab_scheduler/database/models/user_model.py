@@ -5,9 +5,4 @@ class UserModel:
         self.db: SQL = db
         
     def save_user(self, full_name, role, doc):
-        # result = self.db.get_list(
-        #     '''
-        #     INSERT INTO ...
-        #     '''
-        # )
         pass

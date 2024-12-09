@@ -12,11 +12,9 @@ class MainView(MainTemplate):
         self.add_button(main_section, "Cadastrar Usuário", self.controller.register_user, row=1, sticky="w")
         self.add_button(main_section, "Reservar Laboratório", self.controller.reserve_lab, row=2, sticky="w")
 
-        # Reports Section
         reports_section = self.add_section(self, "Relatórios")
         self.add_button(reports_section, "Gerar Cronograma semanal", self.controller.generate_schedule, row=3, sticky="w")
 
-        # Management Section
         management_section = self.add_section(self, "Gerenciamento")
         self.add_button(management_section, "Gerenciar usuários", self.controller.manage_users, row=4, sticky="w")
         self.add_button(management_section, "Gerenciar reservas", self.controller.manage_reservations,row=5, sticky="w")
