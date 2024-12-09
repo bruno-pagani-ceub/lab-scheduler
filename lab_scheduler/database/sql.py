@@ -145,7 +145,7 @@ class SQL:
         return ret
 
     def get_object(self, query, params=()):
-        cursor = self.conn.cursor()
+        cursor = self.conn.cursor(buffered=True)
         cursor.execute(query, params)
         dados = cursor.fetchone()
         if dados is None:
