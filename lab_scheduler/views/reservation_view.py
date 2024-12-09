@@ -7,7 +7,27 @@ class ReservationView(FormPopup):
         super().__init__(parent, title="Reservas")
 
     def create_widgets(self):
+<<<<<<< Updated upstream
         pass
+=======
+        main_section = self.add_section(self, "Opções")
+
+        self.add_button(
+            main_section,
+            "Cadastrar reserva",
+            command=self.controller.reserve_lab,
+            row=1,
+            sticky="w",
+        )
+        self.add_button(
+            main_section,
+            "Visualizar reservas",
+            command=self.controller.manage_reservations,
+            row=2,
+            sticky="w",
+        )
+
+>>>>>>> Stashed changes
 
 class LabReservationView(FormPopup):
     def __init__(self, parent, controller):
