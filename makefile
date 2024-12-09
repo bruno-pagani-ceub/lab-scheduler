@@ -5,7 +5,14 @@ MYSQL_USER := root
 MYSQL_PASSWORD := senha123
 MYSQL_DATABASE := lab_scheduler
 MYSQL_PORT_TEST := 3307
+DB_CONTAINER_TEST=lab_scheduler_db_test
+DB_CONTAINER_DEV=lab_scheduler_db_dev
 
+shell-test:
+	@docker exec -it $(DB_CONTAINER_TEST) bash -c "mysql -u $(MYSQL_USER) -p$(MYSQL_PASSWORD)"
+
+shell-dev:
+	@docker exec -it $(DB_CONTAINER_DEV) bash -c "mysql -u $(MYSQL_USER) -p$(MYSQL_PASSWORD)"
 
 venv:
 	@echo "Creating virtual environment and installing dependencies..."
@@ -32,7 +39,7 @@ db:
 	@echo "MySQL is ready."
 
 dev: venv
-	@$(MAKE) db ENVIRONMENT=development COMPOSE_FILE=docker-compose.dev.yml DB_CONTAINER_NAME=lab_scheduler_db_dev
+	@$(MAKE) db ENVIRONMENT=development COMPOSE_FILE=docker-compose.dev.yml DB_CONTAINER_NAME=$(DB_CONTAINER_DEV)
 	@echo "Running the application locally..."
 	export MYSQL_HOST=$(MYSQL_HOST) && \
 	export MYSQL_USER=$(MYSQL_USER) && \
@@ -40,8 +47,8 @@ dev: venv
 	export MYSQL_DATABASE=$(MYSQL_DATABASE) && \
 	$(PYTHON) -m lab_scheduler.main
 
-test: venv
-	@$(MAKE) db ENVIRONMENT=testing COMPOSE_FILE=docker-compose.test.yml DB_CONTAINER_NAME=lab_scheduler_db_test
+test: clean-test venv
+	@$(MAKE) db ENVIRONMENT=testing COMPOSE_FILE=docker-compose.test.yml DB_CONTAINER_NAME=$(DB_CONTAINER_TEST)
 	@echo "Running the application in test environment locally..."
 	export MYSQL_HOST=$(MYSQL_HOST) && \
 	export MYSQL_USER=$(MYSQL_USER) && \
@@ -53,5 +60,10 @@ test: venv
 clean:
 	@echo "Cleaning up..."
 	docker compose -f docker-compose.dev.yml down -v
+	docker compose -f docker-compose.test.yml down -v
+	rm -rf $(VENV_DIR)
+
+clean-test:
+	@echo "Cleaning up test env..."
 	docker compose -f docker-compose.test.yml down -v
 	rm -rf $(VENV_DIR)

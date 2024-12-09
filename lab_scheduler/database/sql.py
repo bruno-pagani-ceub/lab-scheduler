@@ -65,7 +65,6 @@ class SQL:
         try:
             cursor.executemany(query, params_list)
             self.conn.commit()
-            # Retrieve the IDs of the inserted rows
             inserted_ids = cursor.lastrowid
             num_rows = cursor.rowcount
             first_id = inserted_ids - num_rows + 1
