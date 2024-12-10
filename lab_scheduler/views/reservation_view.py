@@ -1,5 +1,5 @@
 import tkinter as tk
-from tkinter import NSEW, ttk, messagebox
+from tkinter import ttk, messagebox
 from datetime import datetime
 from lab_scheduler.views.templates.form_popup_template import FormPopup
 from lab_scheduler import static
@@ -41,7 +41,7 @@ class LabReservationView(FormPopup):
             "date": "",
             "lab": "",
             "timeslot": "",
-            "type": ""
+            "type": "",
         }
 
         self.recurrent_selected_items = {
@@ -51,7 +51,7 @@ class LabReservationView(FormPopup):
             "timeslot": "",
             "type": "",
             "semester": "",
-            "year": ""
+            "year": "",
         }
 
         self.user_var = tk.StringVar()
@@ -133,9 +133,13 @@ class LabReservationView(FormPopup):
             required=True,
             sticky="W",
         )
-        
+
         self.valid_date_label = ttk.Label(
-            self.dynamic_frame, text="", background="light grey", width=1, anchor="center"
+            self.dynamic_frame,
+            text="",
+            background="light grey",
+            width=1,
+            anchor="center",
         )
         self.valid_date_label.grid(row=1, column=2, padx=5, pady=5, sticky="w")
 
@@ -174,7 +178,7 @@ class LabReservationView(FormPopup):
             row=0,
             column=0,
             required=True,
-            state="readonly"
+            state="readonly",
         ).grid(sticky="W")
 
         self.semester_var = tk.StringVar()
@@ -187,7 +191,7 @@ class LabReservationView(FormPopup):
             row=1,
             column=0,
             required=True,
-            state="readonly"
+            state="readonly",
         ).grid(sticky="W")
 
         current_year = datetime.now().year
@@ -208,7 +212,9 @@ class LabReservationView(FormPopup):
         self.add_button(
             self.dynamic_frame,
             text="Buscar horários",
-            command=lambda: self.search_timeslots_weekday(self.weekday_var.get(), self.semester_var.get(), self.year_var.get()),
+            command=lambda: self.search_timeslots_weekday(
+                self.weekday_var.get(), self.semester_var.get(), self.year_var.get()
+            ),
             row=4,
             column=0,
         )
@@ -231,7 +237,7 @@ class LabReservationView(FormPopup):
             {"column": col, "text": att, "width": 70, "anchor": "w"}
             for att, col in lab_list[0].items()
         ]
-        
+
         self.lab_var = self.add_treeview(
             self.dynamic_frame,
             columns_configs=columns_configs,
@@ -255,11 +261,11 @@ class LabReservationView(FormPopup):
             columns_configs=[
                 {"column": 0, "text": "id", "width": 0, "anchor": "center"},
                 {"column": 1, "text": "Início", "width": 100, "anchor": "center"},
-                {"column": 2, "text": "Fim", "width": 100, "anchor": "center"}
+                {"column": 2, "text": "Fim", "width": 100, "anchor": "center"},
             ],
             row=row,
             column=column,
-            columnspan=1
+            columnspan=1,
         )
         self.timeslot_var.column(0, stretch=False)
         self.timeslot_var.bind(
@@ -270,16 +276,24 @@ class LabReservationView(FormPopup):
         )
 
     def search_timeslots(self, date, lab):
+        for i in self.timeslot_var.get_children():
+            self.timeslot_var.delete(i)
         available_timeslots = self.controller.get_available_timeslots(date, lab)
-        converted_times = [self.controller.convert(line) for line in available_timeslots]
+        converted_times = [
+            self.controller.convert(line) for line in available_timeslots
+        ]
         self.timeslot_var.delete(*self.timeslot_var.get_children())
         for converted_time in converted_times:
             self.timeslot_var.insert("", "end", values=tuple(converted_time.values()))
 
     def search_timeslots_weekday(self, weekday, semester, year):
+        for i in self.timeslot_var.get_children():
+            self.timeslot_var.delete(i)
         self.recurrent_selected_items["semester"] = self.semester_var.get()
         weekday_number = static.SQL_WEEKDAYS_NUMBER[weekday]
-        timeslots = self.controller.get_timeslots_weekday(weekday_number, semester, year)
+        timeslots = self.controller.get_timeslots_weekday(
+            weekday_number, semester, year
+        )
         converted_timeslots = [self.controller.convert(line) for line in timeslots]
         self.timeslot_var.delete(*self.timeslot_var.get_children())
         for converted_time in converted_timeslots:
@@ -311,12 +325,27 @@ class LabReservationView(FormPopup):
                 messagebox.showerror("Error", f"The field '{key}' is required.")
                 pass
         self.controller.submit_single_reservation(self.single_selected_items)
-        
+        messagebox.showinfo("Sucesso", f"Reserva registrada com sucesso!")
+        for row in self.timeslot_var.get_children():
+            self.timeslot_var.delete(row)
+
     def submit_recurrent_reservation(self):
-        values = [self.recurrent_selected_items["user"], static.SQL_WEEKDAYS_NUMBER[self.weekday_var.get()], self.recurrent_selected_items["lab"],
-                  self.recurrent_selected_items["timeslot"], self.type_var.get(), self.recurrent_selected_items["semester"], self.year_var.get()]
-        self.recurrent_selected_items = dict(zip(self.recurrent_selected_items.keys(), values))
+        values = [
+            self.recurrent_selected_items["user"],
+            static.SQL_WEEKDAYS_NUMBER[self.weekday_var.get()],
+            self.recurrent_selected_items["lab"],
+            self.recurrent_selected_items["timeslot"],
+            self.type_var.get(),
+            self.recurrent_selected_items["semester"],
+            self.year_var.get(),
+        ]
+        self.recurrent_selected_items = dict(
+            zip(self.recurrent_selected_items.keys(), values)
+        )
         self.controller.submit_recurrent_reservation(self.recurrent_selected_items)
+        messagebox.showinfo("Sucesso", f"Reserva registrada com sucesso!")
+        for row in self.timeslot_var.get_children():
+            self.timeslot_var.delete(row)
 
     def submit_user(self):
         user_ident = self.user_var.get()
@@ -327,8 +356,9 @@ class LabReservationView(FormPopup):
             self.result_label.config(
                 text=f"{search_result[0]['nm_usuario']} - {search_result[0]['ds_tipo_usuario']}"
             )
-            self.single_selected_items["user"] = search_result[0]['id']
-            self.recurrent_selected_items["user"] = search_result[0]['id']
+            self.single_selected_items["user"] = search_result[0]["id"]
+            self.recurrent_selected_items["user"] = search_result[0]["id"]
+
 
 class UpdateReservationView(FormPopup):
     def __init__(self, parent, controller):
