@@ -15,7 +15,7 @@ class ReservationController:
         pass
 
     def reserve_lab(self):
-        pass
+        LabReservationController(self.root, self.db)
 
 
 class LabReservationController:
