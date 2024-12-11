@@ -1,5 +1,5 @@
-from lab_scheduler.views import ReservationView, LabReservationView
-from lab_scheduler.database.models import ReservationModel, LabReservationModel
+from lab_scheduler.views import ReservationView, LabReservationView, ViewReservationView
+from lab_scheduler.database.models import ReservationModel, ViewReservationModel, LabReservationModel
 import datetime
 from lab_scheduler import static
 
@@ -12,7 +12,7 @@ class ReservationController:
         self.model = ReservationModel(db=db)
 
     def manage_reservations(self):
-        pass
+        ViewReservationController(self.root, self.db)
 
     def reserve_lab(self):
         LabReservationController(self.root, self.db)
@@ -65,8 +65,23 @@ class LabReservationController:
                                            selected_items["lab"], selected_items["timeslot"])
 
     def submit_recurrent_reservation(self, selected_items):
-        self.model.make_recurrent_reservation(
+        success_check = self.model.make_recurrent_reservation(
             selected_items["user"], selected_items["type"], selected_items["lab"], selected_items["weekday"],
             selected_items["timeslot"], selected_items["semester"], selected_items["year"]
         )
         print(f"Timeslot: {selected_items["timeslot"]}")
+        if success_check:
+            return True
+        else:
+            return False
+
+class ViewReservationController:
+    def __init__(self, root, db):
+        self.root = root
+        self.db = db
+        self.view = ViewReservationView(root, self)
+        self.model = ViewReservationModel(db=db)
+
+    def search_all(self):
+        all_list = ViewReservationModel(db=self.db).search_all()
+        return all_list

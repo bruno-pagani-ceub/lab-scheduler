@@ -276,8 +276,8 @@ class LabReservationView(FormPopup):
         )
 
     def search_timeslots(self, date, lab):
-        for i in self.timeslot_var.get_children():
-            self.timeslot_var.delete(i)
+        for _ in self.timeslot_var.get_children():
+            self.timeslot_var.delete(_)
         available_timeslots = self.controller.get_available_timeslots(date, lab)
         converted_times = [
             self.controller.convert(line) for line in available_timeslots
@@ -305,6 +305,8 @@ class LabReservationView(FormPopup):
             return
         item_data = treeview.item(selected_item[0], "values")
         list[target] = item_data[0]
+        self.recurrent_selected_items[target] = list[target]
+        self.single_selected_items[target] = list[target]
         print(f"Selected {target} updated: {list[target]}")
 
     def validate_date(self, *args):
@@ -342,10 +344,13 @@ class LabReservationView(FormPopup):
         self.recurrent_selected_items = dict(
             zip(self.recurrent_selected_items.keys(), values)
         )
-        self.controller.submit_recurrent_reservation(self.recurrent_selected_items)
-        messagebox.showinfo("Sucesso", f"Reserva registrada com sucesso!")
-        for row in self.timeslot_var.get_children():
-            self.timeslot_var.delete(row)
+        success_check = self.controller.submit_recurrent_reservation(self.recurrent_selected_items)
+        if success_check == True:
+            messagebox.showinfo("Sucesso", f"Reserva registrada com sucesso!")
+            for row in self.timeslot_var.get_children():
+                self.timeslot_var.delete(row)
+        else:
+            messagebox.showinfo("Erro", f"Esse horário já está reservado nesse dia da semana para esse laboratório!")
 
     def submit_user(self):
         user_ident = self.user_var.get()
@@ -360,11 +365,128 @@ class LabReservationView(FormPopup):
             self.recurrent_selected_items["user"] = search_result[0]["id"]
 
 
-class UpdateReservationView(FormPopup):
+class ViewReservationView(FormPopup):
     def __init__(self, parent, controller):
         self.controller = controller
         self.time_slots = []
-        super().__init__(parent, title="Atualizar Reserva")
+        super().__init__(parent, title="Gerenciar Reservas")
 
     def create_widgets(self):
-        pass
+
+        self.grid_columnconfigure([0, 1, 2, 3, 4, 5], weight=1)
+        self.grid_rowconfigure([0, 1, 2, 3, 4, 5], weight=1)
+
+        self.add_label(
+            self, "Buscar por:", row=0, column=0, columnspan=5
+        )
+
+        self.reservation_type = tk.StringVar()
+        user_radio = ttk.Radiobutton(
+            self,
+            text="Nome de usuário",
+            value="Nome",
+            variable=self.reservation_type
+        )
+        user_radio.grid(row=1, column=0, padx=5, pady=5, sticky="we")
+
+        id_radio = ttk.Radiobutton(
+            self,
+            text="ID de usuário",
+            value="ID",
+            variable=self.reservation_type
+        )
+        id_radio.grid(row=1, column=1, padx=5, pady=5, sticky="we")
+
+        lab_radio = ttk.Radiobutton(
+            self,
+            text="Sala",
+            value="Sala",
+            variable=self.reservation_type
+        )
+        lab_radio.grid(row=1, column=2, padx=5, pady=5, sticky="we")
+
+        block_radio = ttk.Radiobutton(
+            self,
+            text="Bloco",
+            value="Bloco",
+            variable=self.reservation_type
+        )
+        block_radio.grid(row=1, column=3, padx=5, pady=5, sticky="we")
+
+        date_radio = ttk.Radiobutton(
+            self,
+            text="Data",
+            value="Data",
+            variable=self.reservation_type
+        )
+        date_radio.grid(row=1, column=4, padx=5, pady=5, sticky="we")
+
+        self.search_var = tk.StringVar()
+        self.add_entry(
+            self,
+            label_text="Termo de busca",
+            variable=self.search_var,
+            row=2,
+            column=0,
+            sticky="W"
+        )
+
+        self.add_button(
+            self,
+            text="Buscar",
+            command=lambda: self.filter_treeview(self.reservation_type, self.search_var),
+            row=3,
+            column=1,
+        )
+
+        self.add_button(
+            self,
+            text="Resetar",
+            command=lambda: self.populate_tree(),
+            row=3,
+            column=2,
+        )
+
+        self.item_list = self.controller.search_all()
+ 
+        columns_configs = [
+            {"column": header, "text": header, "width": 100, "anchor": "center"}
+            for header in self.item_list[0].keys()
+        ]
+
+        
+        self.tree = self.add_treeview(
+            parent=self,
+            columns_configs=columns_configs,
+            row=4,
+            column=0,
+            columnspan=5,
+        )
+        self.tree.column("id", width=0, stretch=False)
+
+        self.populate_tree()
+
+    def populate_tree(self):
+        for row in self.tree.get_children():
+            self.tree.delete(row)
+        for line in self.item_list:
+            self.tree.insert("", "end", values=(tuple(col for col in line.values())))
+    
+    def filter_treeview(self, type, search):
+        if search == "":
+            pass
+
+        query = self.search_var.get().lower()
+        selected_column = self.reservation_type.get()
+        
+        print(query)
+        print(selected_column)
+
+        filtered_data = [
+            item for item in self.item_list if query == str(item[selected_column]).lower()
+        ]
+
+        for row in self.tree.get_children():
+            self.tree.delete(row)
+        for item in filtered_data:
+            self.tree.insert("", "end", values=(tuple(col for col in item.values())))
