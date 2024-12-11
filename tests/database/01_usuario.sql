@@ -20,3 +20,4 @@ INSERT INTO `tb_usuario` (`id`, `nm_usuario`, `id_tipo_usuario`, `ds_identificac
 INSERT INTO `tb_usuario` (`id`, `nm_usuario`, `id_tipo_usuario`, `ds_identificacao`) VALUES (DEFAULT, 'Maria Pereira', 4, '22222222222');
 INSERT INTO `tb_usuario` (`id`, `nm_usuario`, `id_tipo_usuario`, `ds_identificacao`) VALUES (DEFAULT, 'Lurdes Almeida', 3, '0000003');
 INSERT INTO `tb_usuario` (`id`, `nm_usuario`, `id_tipo_usuario`, `ds_identificacao`) VALUES (DEFAULT, 'Mario Senna', 1, '66666666');
+INSERT INTO `tb_usuario` (`id`, `nm_usuario`, `id_tipo_usuario`, `ds_identificacao`) VALUES (DEFAULT, 'Mario Senna', 1, '66666666');
