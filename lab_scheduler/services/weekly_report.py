@@ -1,8 +1,8 @@
 from datetime import datetime, timedelta
-
 from docx import Document
 from docx.enum.table import WD_TABLE_ALIGNMENT
 from docx.enum.text import WD_ALIGN_PARAGRAPH
+from docx.shared import Pt, RGBColor
 
 
 class WeeklySchedule:
@@ -36,7 +36,11 @@ class WeeklySchedule:
         unique_days = sorted(unique_days)
         unique_times = sorted(unique_times, key=lambda x: x[0])
 
-        self.doc.add_heading("Cronograma Semanal", level=0)
+       
+        heading = self.doc.add_heading("Cronograma Semanal", level=0)
+       
+        for run in heading.runs:
+            run.font.size = Pt(14)
 
         if data:
             first = data[0]
@@ -45,33 +49,53 @@ class WeeklySchedule:
             lab_info = "No data found for this lab and week."
         p = self.doc.add_paragraph(lab_info)
         p.alignment = WD_ALIGN_PARAGRAPH.CENTER
+       
+        for run in p.runs:
+            run.font.size = Pt(10)
 
         all_days_in_week = [(start_of_week + timedelta(days=i)) for i in range(7)]
         
+       
         table = self.doc.add_table(rows=len(unique_times) + 1, cols=8)
         table.alignment = WD_TABLE_ALIGNMENT.CENTER
         table.style = "Medium Shading 1 Accent 1"
 
+       
         header_cells = table.rows[0].cells
         header_cells[0].text = "Horário"
         for i, day_date in enumerate(all_days_in_week):
             header_cells[i+1].text = day_date.strftime("%a\n%d/%m")
 
+       
         for r_idx, time_slot in enumerate(unique_times, start=1):
             time_cell = table.rows[r_idx].cells[0]
             time_cell.text = f"{time_slot[0]} - {time_slot[1]}"
 
             for c_idx, day_date in enumerate(all_days_in_week, start=1):
                 cell = table.rows[r_idx].cells[c_idx]
+
+                cell.text = ""
+
                 key = (day_date.date(), time_slot)
+                cell_paragraph = cell.paragraphs[0]
+                run = cell_paragraph.add_run()
+
                 if key in schedule:
                     info = schedule[key]
                     if info['reserva_id']:
-                        cell.text = f"Reservado por {info['usuario']} ({info['cod_reserva']})"
+                        run.text = f"Reservado por {info['usuario']} ({info['cod_reserva']}) - {info['tp_reserva']}"
                     else:
-                        cell.text = "Disponível"
+                        run.text = "Disponível"
+                        run.font.color.rgb = RGBColor(0x00, 0x80, 0x00)
                 else:
-                    cell.text = "Sem horário"
+                    run.text = "Sem horário"
+                    run.font.color.rgb = RGBColor(0xFF, 0x00, 0x00) 
+
+        for row in table.rows:
+            for cell in row.cells:
+                for paragraph in cell.paragraphs:
+                    for run in paragraph.runs:
+                        run.font.size = Pt(8)
 
         doc_name = f"weekly_schedule_{lab}_{start_of_week.strftime('%Y%m%d')}.docx"
         self.doc.save(doc_name)
