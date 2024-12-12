@@ -267,12 +267,16 @@ class UserRegistrationView(FormPopup):
         full_name_entry.focus()
 
         self.position_var = tk.StringVar()
-        self.add_entry(
-            self,
-            label_text="Posição",
+        field_name = "Posição"
+        self.required_fields.append((field_name, self.position_var))
+        self.positions = self.controller.get_positions()
+        self.add_combobox(
+            parent=self,
+            label_text=field_name,
             variable=self.position_var,
+            values=list(self.positions.keys()),
             row=2,
-            required=True
+            required=True,
         )
 
         self.id_doc_var = tk.StringVar()
@@ -298,8 +302,9 @@ class UserRegistrationView(FormPopup):
             return
 
         full_name = self.full_name_var.get().strip()
-        role = self.position_var.get().strip()  # TODO: Aqui deve ser uma ComboBox
-        doc = self.id_doc_var.get().strip()  # TODO: Aqui pode ter validação de documento
+        role = self.position_var.get().strip()
+        role = self.positions[role]
+        doc = self.id_doc_var.get().strip()
 
         try:
             self.controller.create_user(full_name, role, doc)
