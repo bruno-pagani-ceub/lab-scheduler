@@ -153,18 +153,24 @@ class FormPopup(tk.Toplevel):
         scrollbar.grid(row=row, column=len(columns_configs) + 1, sticky="ns")
         return tree
 
-    def check_required_fields(self):
-        for field_name, variable in self.required_fields:
-            value = variable.get()
-            if isinstance(variable, tk.BooleanVar):
+    def check_required_fields(self, required_fields=None):
+        if not required_fields:
+            required_fields = self.required_fields
+        for field_name, variable in required_fields:
+            if isinstance(variable, ttk.Treeview):
+                value = variable.selection()
+            else:
+                value = variable.get()
+            
+            if isinstance(value, str) and not value.strip():
+                messagebox.showerror("Error", f"The field '{field_name}' is required.")
+                return False
+            elif isinstance(variable, tk.BooleanVar) or isinstance(value, tuple):
                 if not value:
                     messagebox.showerror(
                         "Error", f"The field '{field_name}' is required."
                     )
                     return False
-            elif not value.strip():
-                messagebox.showerror("Error", f"The field '{field_name}' is required.")
-                return False
         return True
 
     def submit(self):

@@ -19,7 +19,7 @@ Os laboratórios, por sua vez, são identificados pelo número do bloco, número
 
 Os horários determinam as informações temporais relativas ao semestre: data, horário de início e fim da reserva.
 
-Por fim, cada reserva tem identificação do usuário titular, o laboratório reservado e o status da reserva (ativa ou não). Ela se relaciona com as entidades "laboratório" e "horário" através da tabela associativa ta_laboratorio_horario, que associa cada laboratório com os horários definidos pela administração e define se cada "slot" está disponível ou não.
+Por fim, cada reserva tem identificação do usuário titular, o laboratório reservado, um código que determina se é parte de uma reserva recorrente, e o status da reserva (ativa ou não). Ela se relaciona com as entidades "laboratório" e "horário" através da tabela associativa ta_laboratorio_horario, que associa cada laboratório com os horários definidos pela administração e define se cada "slot" está disponível ou não.
 
 Com esses dados disponíveis, é possível organizar o sistema de reservas de maneira eficiente e programar um sistema que realize sua função de forma satisfatória.
 

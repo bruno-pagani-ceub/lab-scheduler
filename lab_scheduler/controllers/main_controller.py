@@ -3,6 +3,7 @@ from lab_scheduler.controllers.reports_controller import ScheduleGenerationContr
 from lab_scheduler.controllers.reservation_controller import (
     LabReservationController,
     ReservationController,
+    ViewReservationController
 )
 from lab_scheduler.controllers.timeslots_controller import TimeSlotsController
 from lab_scheduler.controllers.user_controller import (
