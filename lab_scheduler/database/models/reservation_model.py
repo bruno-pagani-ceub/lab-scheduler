@@ -135,7 +135,35 @@ class LabReservationModel:
 
         return self.db.get_list(query, (date, lab))
 
-    def get_base_date(self, weekday, semester, year):
+    
+    def get_available_timeslots_weekday(self, lab, weekday, semester, year):
+        
+        query = """
+        SELECT
+            MAX(h.hr_inicio),
+            MAX(h.hr_fim)
+        FROM
+            tb_reserva r
+        RIGHT JOIN ta_laboratorio_horario lh 
+            on
+            r.id_laboratorio_horario = lh.id
+        join tb_horario h 
+            on
+            lh.id_horario = h.id
+        join tb_laboratorio l
+            on
+            lh.id_laboratorio = l.id
+        WHERE
+            l.id = %s
+            and WEEKDAY(h.dt_dia) = %s
+            AND h.dt_dia >= %s
+            and h.dt_dia <= %s
+        GROUP BY
+            WEEKDAY(h.dt_dia),
+            CONCAT(h.hr_inicio, ' - ', h.hr_fim)
+        HAVING
+            MAX(r.id) is NULL
+        """
 
         if semester == "1":
             date_start = f"{year}-01-01"
@@ -144,14 +172,7 @@ class LabReservationModel:
             date_start = f"{year}-07-01"
             date_end = f"{year}-12-31"
 
-        query = """SELECT MIN(dt_dia) AS base_date FROM tb_horario WHERE DAYOFWEEK(dt_dia) = %s AND dt_dia >= %s AND dt_dia <= %s"""
-
-        return self.db.get_object(query, (weekday, date_start, date_end))
-
-    def get_available_timeslots_weekday(self, date):
-        query = """SELECT id, hr_inicio, hr_fim FROM tb_horario WHERE dt_dia = %s"""
-
-        return self.db.get_list(query, (date,))
+        return self.db.get_list(query, (lab, weekday, date_start, date_end))
 
 
 class ViewReservationModel:

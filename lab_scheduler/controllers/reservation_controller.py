@@ -51,12 +51,10 @@ class LabReservationController:
             adjusted_date, lab
         )
 
-    def get_timeslots_weekday(self, weekday, semester, year):
-        start_date = LabReservationModel(db=self.db).get_base_date(
-            weekday, semester, year
-        )
-        timeslots = LabReservationModel(db=self.db).get_available_timeslots_weekday(
-            start_date["base_date"]
+    
+    def get_timeslots_weekday(self, lab, weekday, semester, year):
+        timeslots = LabReservationModel(db=self.db).get_available_timeslots_weekday_test(
+            lab, weekday, semester, year
         )
         return timeslots
 

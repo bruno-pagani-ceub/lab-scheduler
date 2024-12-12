@@ -139,4 +139,3 @@ WHERE h.dt_dia = '2025-01-12'
   AND h.hr_inicio = CAST('16:00' AS TIME) 
   AND h.hr_fim = CAST('17:30' AS TIME)
   AND l.id = 4;
-  AND l.id = 4;

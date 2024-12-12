@@ -1221,4 +1221,3 @@ INSERT INTO tb_horario (dt_dia,hr_inicio,hr_fim) VALUES
 	 ('2025-06-22','16:00:00','17:30:00');
 INSERT INTO tb_horario (dt_dia,hr_inicio,hr_fim) VALUES
 	 ('2025-06-29','16:00:00','17:30:00');
-	 ('2025-06-29','16:00:00','17:30:00');

@@ -286,13 +286,15 @@ class LabReservationView(FormPopup):
         for converted_time in converted_times:
             self.timeslot_var.insert("", "end", values=tuple(converted_time.values()))
 
-    def search_timeslots_weekday(self, weekday, semester, year):
+
+    def search_timeslots_weekday(self, lab, weekday, semester, year):
         for i in self.timeslot_var.get_children():
             self.timeslot_var.delete(i)
         self.recurrent_selected_items["semester"] = self.semester_var.get()
         weekday_number = static.SQL_WEEKDAYS_NUMBER[weekday]
-        timeslots = self.controller.get_timeslots_weekday(
-            weekday_number, semester, year
+        lab_id = self.recurrent_selected_items["lab"]
+        timeslots = self.controller.get_timeslots_weekday_test(
+            lab_id, weekday_number, self.recurrent_selected_items["semester"], self.recurrent_selected_items["year"]
         )
         converted_timeslots = [self.controller.convert(line) for line in timeslots]
         self.timeslot_var.delete(*self.timeslot_var.get_children())
