@@ -6,8 +6,8 @@ class LabController:
     def __init__(self, root, db):
         self.root = root
         self.db = db
-        self.view = LabView(root, self)
         self.model = LabModel(db=db)
+        self.view = LabView(root, self)
 
     def load_labs(self, ds_sala):
         return self.model.load_labs(ds_sala)
@@ -27,8 +27,8 @@ class LabRegistrationController:
     def __init__(self, root, db):
         self.root = root
         self.db = db
-        self.view = LabRegistrationView(root, self)
         self.model = LabModel(db=db)
+        self.view = LabRegistrationView(root, self)
 
     def create_lab(self, ds_bloco, ds_sala, qtd_pcs):
         self.model.create_lab(ds_bloco, ds_sala, qtd_pcs)
