@@ -51,6 +51,7 @@ class LabReservationView(FormPopup):
             "weekday": "",
             "lab": "",
             "timeslot": "",
+            "hr_inicio": "",
             "type": "",
             "semester": "",
             "year": "",
@@ -279,7 +280,7 @@ class LabReservationView(FormPopup):
         self.timeslot_var.bind(
             "<<TreeviewSelect>>",
             lambda event: self.update_selected_item(
-                event, self.timeslot_var, "timeslot", type
+                event, self.timeslot_var, ["timeslot", "hr_inicio"], type
             ),
         )
 
@@ -322,14 +323,17 @@ class LabReservationView(FormPopup):
         for converted_time in converted_timeslots:
             self.timeslot_var.insert("", "end", values=tuple(converted_time.values()))
 
-    def update_selected_item(self, event, treeview, target, list):
+    def update_selected_item(self, event, treeview:ttk.Treeview, targets, current_dict):
         selected_item = treeview.selection()
         if not selected_item:
             return
         item_data = treeview.item(selected_item[0], "values")
-        list[target] = item_data[0]
-        self.recurrent_selected_items[target] = list[target]
-        self.single_selected_items[target] = list[target]
+        if not isinstance(targets, list):
+            targets = [targets]
+        for i, target in enumerate(targets):
+            if target in current_dict:
+                current_dict[target] = item_data[i]
+
 
     def validate_date(self, *args):
         date_value = self.date.get()
@@ -349,12 +353,13 @@ class LabReservationView(FormPopup):
                 ("Horário", self.timeslot_var),
                 ("Título da reserva", self.type_var),
             ]
-        self.check_required_fields(required_fields)
+        if not self.check_required_fields(required_fields):
+            return
         self.single_selected_items["type"] = self.type_var.get()
-        for key, value in self.single_selected_items.items():
-            if value == "":
-                messagebox.showerror("Error", f"The field '{key}' is required.")
-                pass
+        # for key, value in self.single_selected_items.items():
+        #     if value == "":
+        #         messagebox.showerror("Error", f"The field '{key}' is required.")
+        #         pass
         self.controller.submit_single_reservation(self.single_selected_items)
         messagebox.showinfo("Sucesso", "Reserva registrada com sucesso!")
         for row in self.timeslot_var.get_children():
@@ -367,12 +372,14 @@ class LabReservationView(FormPopup):
                 ("Horário", self.timeslot_var),
                 ("Título da reserva", self.type_var),
             ]
-        self.check_required_fields(required_fields)
+        if not self.check_required_fields(required_fields):
+            return
         values = [
             self.recurrent_selected_items["user"],
             static.SQL_WEEKDAYS_NUMBER[self.weekday_var.get()],
             self.recurrent_selected_items["lab"],
             self.recurrent_selected_items["timeslot"],
+            self.recurrent_selected_items["hr_inicio"],
             self.type_var.get(),
             self.recurrent_selected_items["semester"],
             self.year_var.get(),
