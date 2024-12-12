@@ -65,6 +65,12 @@ class UserModel:
 
         return self.db.get_list(load_query, params)
 
+    def get_positions(self):
+        query = '''
+            SELECT * from td_tipo_usuario;
+        '''
+        return self.db.get_list(query)
+        
     def delete_user(self, id):
         print("delete id -> ", id)
         delete_query = """
