@@ -46,6 +46,7 @@ CREATE TABLE ta_laboratorio_horario (
 -- Tabela de reserva
 CREATE TABLE tb_reserva (
     id INT AUTO_INCREMENT PRIMARY KEY,
+    cod_reserva INT NOT NULL,
     is_ativa BOOLEAN NOT NULL DEFAULT TRUE,
     tp_reserva VARCHAR(50) NOT NULL,
     id_usuario INT NOT NULL,
