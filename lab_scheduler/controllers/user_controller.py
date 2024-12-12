@@ -6,8 +6,8 @@ class UserController:
     def __init__(self, root, db):
         self.root = root
         self.db = db
-        self.view = UserView(root, self)
         self.model = UserModel(db=db)
+        self.view = UserView(root, self)
 
     def load_users(self, nm_usuario):
         return self.model.load_users(nm_usuario)
@@ -28,11 +28,15 @@ class UserRegistrationController:
     def __init__(self, root, db):
         self.root = root
         self.db = db
-        self.view = UserRegistrationView(root, self)
         self.model = UserModel(db=db)
+        self.view = UserRegistrationView(root, self)
 
     def create_user(self, full_name, role, doc):
         self.model.save_user(full_name, role, doc)
+        
+    def get_positions(self):
+        result = self.model.get_positions()
+        return {line["ds_tipo_usuario"] : line["id"] for line in result}
 
 
 class UpdateUserController:
