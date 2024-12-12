@@ -8,8 +8,8 @@ class ReservationController:
     def __init__(self, root, db):
         self.root = root
         self.db = db
-        self.view = ReservationView(root, self)
         self.model = ReservationModel(db=db)
+        self.view = ReservationView(root, self)
 
     def manage_reservations(self):
         ViewReservationController(self.root, self.db)
@@ -22,22 +22,24 @@ class LabReservationController:
     def __init__(self, root, db):
         self.root = root
         self.db = db
-        self.view = LabReservationView(root, self)
         self.model = LabReservationModel(db=db)
+        self.view = LabReservationView(root, self)
 
     def get_user_data(self, user_id):
-        result = LabReservationModel(db=self.db).get_user(user_id)
+        result = self.model.get_user(user_id)
         if result:
             return result
         else:
             return ""
 
     def retrieve_lab(self):
-        lab_list = LabReservationModel(db=self.db).get_lab_list()
+        lab_list = self.model.get_lab_list()
         return lab_list
 
     def convert(self, timeslots):
-        for key, value in list(timeslots.items())[1:]:
+        for key, value in timeslots.items():
+            if key not in ["hr_inicio", "hr_fim"]:
+                continue
             total_seconds = value.total_seconds()
             hours = int(total_seconds // 3600)
             minutes = int((total_seconds % 3600) // 60)
@@ -47,16 +49,15 @@ class LabReservationController:
     def get_available_timeslots(self, date, lab):
         datetime_date = datetime.datetime.strptime(date, "%d/%m/%Y")
         adjusted_date = datetime_date.strftime("%Y-%m-%d")
-        return LabReservationModel(db=self.db).get_available_timeslots(
+        return self.model.get_available_timeslots(
             adjusted_date, lab
         )
 
     
     def get_timeslots_weekday(self, lab, weekday, semester, year):
-        timeslots = LabReservationModel(db=self.db).get_available_timeslots_weekday_test(
+        return self.model.get_available_timeslots_weekday(
             lab, weekday, semester, year
         )
-        return timeslots
 
     def submit_single_reservation(self, selected_items):
         self.model.make_single_reservation(selected_items["user"], selected_items["type"],
@@ -67,7 +68,6 @@ class LabReservationController:
             selected_items["user"], selected_items["type"], selected_items["lab"], selected_items["weekday"],
             selected_items["timeslot"], selected_items["semester"], selected_items["year"]
         )
-        print(f"Timeslot: {selected_items["timeslot"]}")
         if success_check:
             return True
         else:
@@ -77,9 +77,9 @@ class ViewReservationController:
     def __init__(self, root, db):
         self.root = root
         self.db = db
-        self.view = ViewReservationView(root, self)
         self.model = ViewReservationModel(db=db)
+        self.view = ViewReservationView(root, self)
 
     def search_all(self):
-        all_list = ViewReservationModel(db=self.db).search_all()
+        all_list = self.model.search_all()
         return all_list

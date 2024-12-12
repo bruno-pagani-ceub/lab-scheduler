@@ -72,9 +72,6 @@ class LabReservationModel:
         }
         date_start, date_end = semester_dates[semester]
 
-        print(timeslot)
-        print(lab, weekday, date_start, date_end)
-
         weekday_query = """SELECT id FROM ta_laboratorio_horario WHERE id_laboratorio = %s AND id_horario IN
                         (SELECT id FROM tb_horario WHERE DAYOFWEEK(dt_dia) = %s AND dt_dia >= %s AND dt_dia <= %s AND hr_inicio IN
                         (SELECT hr_inicio FROM tb_horario WHERE id = %s)) AND id NOT IN
@@ -106,8 +103,6 @@ class LabReservationModel:
         for item in weekday_ids[1:]:
             text_rec, user_rec, labtime_rec = item
             extra_params.append((hashed_id, text_rec, user_rec, labtime_rec))
-            print(hashed_id, text_rec, user_rec, labtime_rec)
-        print(extra_params)
         self.db.insert_many(extra_query, extra_params)
         return True
 
@@ -140,8 +135,8 @@ class LabReservationModel:
         
         query = """
         SELECT
-            MAX(h.hr_inicio),
-            MAX(h.hr_fim)
+            MAX(h.hr_inicio) as hr_inicio,
+            MAX(h.hr_fim) as hr_fim
         FROM
             tb_reserva r
         RIGHT JOIN ta_laboratorio_horario lh 
