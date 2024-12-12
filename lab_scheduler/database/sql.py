@@ -65,10 +65,9 @@ class SQL:
         try:
             cursor.executemany(query, params_list)
             self.conn.commit()
-            inserted_ids = cursor.lastrowid
+            first_id = cursor.lastrowid
             num_rows = cursor.rowcount
-            first_id = inserted_ids - num_rows + 1
-            inserted_ids = list(range(first_id, inserted_ids + 1))
+            inserted_ids = list(range(first_id, first_id + num_rows))
         except Exception as e:
             self.conn.rollback()
             raise e
