@@ -64,9 +64,15 @@ class LabReservationController:
                                            selected_items["lab"], selected_items["timeslot"])
 
     def submit_recurrent_reservation(self, selected_items):
+        print(f"selected_items: {selected_items}")
         success_check = self.model.make_recurrent_reservation(
-            selected_items["user"], selected_items["type"], selected_items["lab"], selected_items["weekday"],
-            selected_items["timeslot"], selected_items["semester"], selected_items["year"]
+            selected_items["user"], 
+            selected_items["type"], 
+            selected_items["lab"], 
+            selected_items["weekday"],
+            selected_items["hr_inicio"], 
+            selected_items["semester"], 
+            selected_items["year"],
         )
         if success_check:
             return True

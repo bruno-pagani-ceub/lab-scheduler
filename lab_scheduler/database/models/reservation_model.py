@@ -64,7 +64,7 @@ class LabReservationModel:
         self.db.upd_del(query_update_reserv_id)
 
     def make_recurrent_reservation(
-        self, user, text, lab, weekday, timeslot, semester, year
+        self, user, text, lab, weekday, start_time, semester, year
     ):
         semester_dates = {
             "1": (f"{year}-01-01", f"{year}-06-30"),
@@ -72,39 +72,35 @@ class LabReservationModel:
         }
         date_start, date_end = semester_dates[semester]
 
-        weekday_query = """SELECT id FROM ta_laboratorio_horario WHERE id_laboratorio = %s AND id_horario IN
-                        (SELECT id FROM tb_horario WHERE DAYOFWEEK(dt_dia) = %s AND dt_dia >= %s AND dt_dia <= %s AND hr_inicio IN
-                        (SELECT hr_inicio FROM tb_horario WHERE id = %s)) AND id NOT IN
-                        (SELECT id_laboratorio_horario FROM tb_reserva WHERE is_ativa = 1)"""
-
+        weekday_query = '''
+        SELECT
+            lh.id 
+        from ta_laboratorio_horario lh 
+        join tb_horario h on lh.id_horario = h.id 
+        join tb_laboratorio l on lh.id_laboratorio = l.id 
+        left join tb_reserva r on lh.id = r.id_laboratorio_horario
+        where (r.id is null or r.is_ativa = 0)
+            and l.id = %s
+            and DAYOFWEEK(h.dt_dia) = %s
+            and dt_dia >= %s
+            and dt_dia <= %s
+            and h.hr_inicio = %s;
+        '''
         available_weekdays = self.db.get_list(
-            weekday_query, (lab, weekday, date_start, date_end, timeslot)
+            weekday_query, (lab, weekday, date_start, date_end, start_time)
         )
 
         if len(available_weekdays) == 0:
             return False
 
+        new_reservation_id = self.db.get_int("SELECT MAX(cod_reserva) + 1 FROM tb_reserva r;")
         weekday_ids = [
-            (text, user, item["id"]) for item in available_weekdays
+            (new_reservation_id, text, user, item["id"]) for item in available_weekdays
         ]
 
-        query = """INSERT INTO tb_reserva VALUES (DEFAULT, 0, 1, %s, %s, %s)"""
-        self.db.insert(query, weekday_ids[0])
-
-        hash_id_query = """SELECT (id * 2654435761) MOD 1000000007 AS hashed_id FROM tb_reserva WHERE id = LAST_INSERT_ID()"""
-        hashed_id = self.db.get_object(hash_id_query)["hashed_id"]
-        
-        query_update_reserv_id = """UPDATE tb_reserva SET cod_reserva = %s WHERE id = LAST_INSERT_ID()"""
-        self.db.upd_del(query_update_reserv_id, (hashed_id,))
-
-        extra_query = """INSERT INTO tb_reserva VALUES (DEFAULT, %s, 1, %s, %s, %s)"""
-        
-        extra_params = []
-        for item in weekday_ids[1:]:
-            text_rec, user_rec, labtime_rec = item
-            extra_params.append((hashed_id, text_rec, user_rec, labtime_rec))
-        self.db.insert_many(extra_query, extra_params)
-        return True
+        query = """INSERT INTO tb_reserva VALUES (DEFAULT, %s, 1, %s, %s, %s)"""
+        ids = self.db.insert_many(query, weekday_ids)
+        return True if len(ids) > 0 else False
 
     def get_user(self, id):
         param = []
