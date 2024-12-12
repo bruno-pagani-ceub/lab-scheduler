@@ -1,118 +1,81 @@
 import tkinter as tk
-from tkinter import ttk, messagebox
 from datetime import datetime
+from tkinter import messagebox, ttk
 
-class ScheduleGenerationView:
-    def __init__(self, parent, schedule_data):
-        self.parent = parent
-        self.schedule_data = schedule_data
-        self.filtered_data = schedule_data
-        self.setup_view()
+from lab_scheduler.views.templates.form_popup_template import FormPopup
 
-    def setup_view(self):
-        window = tk.Toplevel(self.parent)
-        window.title("Cronograma Semestral")
-        window.geometry("1000x600")
 
-        search_frame = tk.Frame(window)
-        search_frame.pack(fill="x", padx=10, pady=5)
+class ScheduleGenerationView(FormPopup):
 
-        tk.Label(search_frame, text="Pesquisar por data:").pack(side="left")
-        self.search_var = tk.StringVar()
-        search_entry = ttk.Entry(search_frame, textvariable=self.search_var)
-        search_entry.pack(side="left", padx=5)
+    def __init__(self, parent, controller):
+        self.controller = controller
+        super().__init__(parent, title="Cronograma Semanal")
 
-        tk.Label(search_frame, text="Horário (Início):").pack(side="left", padx=5)
-        self.search_time_var = tk.StringVar()
-        time_entry = ttk.Entry(search_frame, textvariable=self.search_time_var)
-        time_entry.pack(side="left", padx=5)
+    def create_widgets(self):
+        self.add_label(self, "Cronograma Semanal", row=0, column=0, columnspan=2)
+        
+        self.labs = self.controller.get_labs()
 
-        tk.Label(search_frame, text="Laboratório:").pack(side="left", padx=5)
-        self.search_lab_var = tk.StringVar()
-        lab_entry = ttk.Entry(search_frame, textvariable=self.search_lab_var)
-        lab_entry.pack(side="left", padx=5)
-
-        search_button = ttk.Button(search_frame, text="Pesquisar", command=self.search_by_criteria)
-        search_button.pack(side="left", padx=5)
-
-        reset_button = ttk.Button(search_frame, text="Resetar", command=self.reset_table)
-        reset_button.pack(side="left", padx=5)
-
-        table_frame = tk.Frame(window)
-        table_frame.pack(fill="both", expand=True, padx=10, pady=5)
-
-        self.table = ttk.Treeview(
-            table_frame,
-            columns=("Data", "Início", "Fim", "Atividade", "Laboratório"),
-            show='headings'
+        self.lab_var = tk.StringVar()
+        field_name = "Laboratório"
+        self.required_fields.append((field_name, self.lab_var))
+        self.add_combobox(
+            parent=self,
+            label_text=field_name,
+            variable=self.lab_var,
+            values=list(self.labs.keys()),
+            row=1,
+            required=True,
         )
-        self.table.heading("#1", text="Data")
-        self.table.heading("#2", text="Início")
-        self.table.heading("#3", text="Fim")
-        self.table.heading("#4", text="Atividade")
-        self.table.heading("#5", text="Laboratório")
-        self.table.column("#1", anchor="center", width=150)
-        self.table.column("#2", anchor="center", width=100)
-        self.table.column("#3", anchor="center", width=100)
-        self.table.column("#4", anchor="center", width=200)
-        self.table.column("#5", anchor="center", width=150)
+        
+        self.valid_date_label = ttk.Label(
+            self,
+            text="",
+            background="light grey",
+            width=1,
+            anchor="center",
+        )
+        self.valid_date_label.grid(row=1, column=2, padx=5, pady=5, sticky="w")
 
-        scrollbar = ttk.Scrollbar(table_frame, orient="vertical", command=self.table.yview)
-        self.table.configure(yscrollcommand=scrollbar.set)
-        self.table.pack(side="left", fill="both", expand=True)
-        scrollbar.pack(side="right", fill="y")
+        self.date_var = tk.StringVar()
+        self.date_var.trace_add("write", self.validate_date)
+        self.date_entry = self.add_entry(
+            self,
+            label_text="Data da reserva (dd/mm/aaaa)",
+            variable=self.date_var,
+            row=2,
+            required=True,
+            sticky="W",
+        )
+        self.required_fields.append(("Data da reserva", self.date_entry))
 
-        self.populate_table(self.schedule_data)
-
-        close_button = ttk.Button(window, text="Fechar", command=window.destroy)
-        close_button.pack(pady=10)
-
-    def populate_table(self, data):
-        self.table.delete(*self.table.get_children())
-        for item in data:
+        self.add_button(
+            self,
+            text="Gerar",
+            command=self.submit,
+            row=3,
+        )
+        
+    def validate_date(self, *args):
+        date_value = self.date_var.get()
+        if len(date_value) == 10:
             try:
-                if isinstance(item['data'], str):
-                    formatted_date = item['data']
-                else:
-                    formatted_date = datetime.strptime(str(item['data']), "%Y-%m-%d").strftime("%d-%m-%Y")
-            except (ValueError, TypeError):
-                formatted_date = "Data Inválida"
-
-            laboratorio = item.get('laboratorio', 'Desconhecido')
-
-            self.table.insert("", "end", values=(
-                formatted_date, item['inicio'], item['fim'], item['atividade'], laboratorio
-            ))
-
-    def search_by_criteria(self):
-        query_date = self.search_var.get().strip()
-        query_time = self.search_time_var.get().strip()
-        query_lab = self.search_lab_var.get().strip()
-
-        self.filtered_data = self.schedule_data
-
-        if query_date:
-            try:
-                formatted_date = datetime.strptime(query_date, "%d-%m-%Y").strftime("%d-%m-%Y")
-                self.filtered_data = [item for item in self.filtered_data if item['data'] == formatted_date]
+                parsed_date = datetime.strptime(date_value, "%d/%m/%Y")
+                self.date_var.set(parsed_date.strftime("%d/%m/%Y"))
+                self.valid_date_label.config(text="✓")
             except ValueError:
-                messagebox.showerror("Erro", "Formato de data inválido. Use dd-mm-yyyy.")
-                return
+                pass
+            
+    def submit(self):
+        if not self.check_required_fields():
+            return
 
-        if query_time:
-            self.filtered_data = [item for item in self.filtered_data if item['inicio'] <= query_time <= item['fim']]
+        date = self.date_var.get()
+        lab = self.labs[self.lab_var.get()]
 
-        if query_lab:
-            self.filtered_data = [item for item in self.filtered_data if str(item['laboratorio']) == query_lab]
-
-        if not self.filtered_data:
-            messagebox.showinfo("Nenhum resultado", "Nenhum horário encontrado.")
-        self.populate_table(self.filtered_data)
-
-    def reset_table(self):
-
-        self.search_var.set("")
-        self.search_time_var.set("")
-        self.search_lab_var.set("")
-        self.filtered_data = self.schedule_data
-        self.populate_table(self.schedule_data)
+        try:
+            fpath = self.controller.generate_schedule(lab, date)
+            messagebox.showinfo("Sucesso", f"Cronograma gerado com sucesso e salvo em {fpath}")
+            self.destroy()
+        except Exception as e:
+            messagebox.showerror("Erro", f"Falha ao gerar cronograma semanal: {e}")
